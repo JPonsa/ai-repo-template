@@ -310,9 +310,99 @@ def cmd_risk(args: argparse.Namespace) -> int:
     raise FactoryError("risk: not implemented yet")
 
 
+def _skill_search_paths() -> list[Path]:
+    """Return candidate global skill directories for different harnesses."""
+    home = Path.home()
+    paths = [
+        home / ".claude" / "skills",
+        home / ".config" / "opencode" / "skills",
+        home / ".local" / "share" / "opencode" / "skills",
+        home / ".agents" / "skills",
+    ]
+    # Also check common plugin/cache locations
+    paths.extend(
+        [
+            home / ".claude" / "plugins",
+            home / ".config" / "claude" / "plugins",
+        ]
+    )
+    return paths
+
+
+def _find_skill(skill_id: str, paths: list[Path]) -> bool:
+    """Return True if a skill appears to exist in any search path."""
+    for base in paths:
+        if not base.exists():
+            continue
+        # Direct directory match
+        if (base / skill_id).exists():
+            return True
+        # Look for skill files
+        for child in base.iterdir():
+            if child.is_dir() and child.name == skill_id:
+                return True
+            # Some installations nest by plugin name
+            if child.is_dir():
+                candidate = child / skill_id
+                if candidate.exists():
+                    return True
+        # Recursive search (shallow)
+        try:
+            for p in base.rglob(skill_id):
+                if p.is_dir():
+                    return True
+        except Exception:
+            continue
+    return False
+
+
 def cmd_audit(args: argparse.Namespace) -> int:
-    """Report harness drift. Implemented by the feedback ticket."""
-    raise FactoryError("audit: not implemented yet")
+    """Report prerequisite skills and basic harness drift."""
+    config = load_config()
+    prereqs = config.get("prerequisites", {})
+    required = list(prereqs.get("required", []))
+    optional = list(prereqs.get("optional", []))
+    upstream = prereqs.get("upstream", "mattpocock/skills")
+    version = prereqs.get("version")
+    commit = prereqs.get("commit")
+
+    print(f"upstream: {upstream}")
+    if version:
+        print(f"version:  {version}")
+    if commit:
+        print(f"commit:   {commit}")
+
+    paths = _skill_search_paths()
+    print("search paths:")
+    for p in paths:
+        print(f"  - {p} ({'exists' if p.exists() else 'missing'})")
+
+    missing_required = []
+    found_required = []
+    for skill_id in required:
+        if _find_skill(skill_id, paths):
+            found_required.append(skill_id)
+            print(f"found (required): {skill_id}")
+        else:
+            missing_required.append(skill_id)
+            print(f"missing (required): {skill_id}")
+
+    for skill_id in optional:
+        if _find_skill(skill_id, paths):
+            print(f"found (optional): {skill_id}")
+        else:
+            print(f"missing (optional): {skill_id}")
+
+    if missing_required:
+        print(
+            "\nwarning: missing required upstream skills. "
+            "Install them globally as per README/TEMPLATE. "
+            "A missing skill is an install error - do not reimplement inline.",
+            file=sys.stderr,
+        )
+        return 0  # warnings, not failures per issue
+    print("\nall required upstream skills found")
+    return 0
 
 
 # --------------------------------------------------------------------------
