@@ -6,15 +6,10 @@ and `GLOSSARY.md` for domain language.
 
 ## Always-relevant context
 
-### Project identity
-
-Mirror the Purpose and Primary consumers from `INTENT.md`. Use one or
-two sentences. Do not copy large sections of `README.md` here.
-
-### Technology snapshot
-
-List the languages, frameworks, package managers, and the real check
-command. Link to `CONTRIBUTING.md` for setup details.
+- **Identity**: mirror the Purpose and Primary consumers from `INTENT.md`,
+  in one or two sentences. Do not copy `README.md` sections here.
+- **Stack**: languages, frameworks, package managers, and the real check
+  command. Setup detail lives in `CONTRIBUTING.md`.
 
 ## Where to look
 
@@ -25,6 +20,7 @@ command. Link to `CONTRIBUTING.md` for setup details.
 | Code rules | `CODING_STANDARDS.md` |
 | Branch, commit, and review rules | `CONTRIBUTING.md` |
 | Decisions, runbooks, research | `docs/index.md` |
+| Architecture, kept current | `docs/architectural-overview.md` |
 | Harness configuration | `factory.toml` |
 | Starting a derived project | `TEMPLATE.md` |
 
@@ -40,7 +36,9 @@ Create or pick an issue, then branch from `main` as
 `<type>/<issue>-<short-description>`. Write a spec when the work spans
 more than one commit, and split it into tickets that each fit in one
 context window. Implement one ticket at a time, with a test at each
-agreed seam. Use conventional commits: `type(scope): short description`.
+agreed seam. Update `docs/architectural-overview.md` when module
+boundaries, dependencies, data flows, or public interfaces change.
+Use conventional commits: `type(scope): short description`.
 Review and pull-request detail is in `CONTRIBUTING.md`.
 
 ## Skills
@@ -61,17 +59,22 @@ Never reimplement a missing skill inline, and never vendor a copy.
 Protected paths and the size ceiling are in `factory.toml`. The gate
 decides. Never judge your own diff as low risk.
 
-## Evidence
+## Evidence and review order
 
 A change is not done until the check passes on the exact commit. Every
-pull request states the commit, the command, and the result in the
-evidence block defined in `CONTRIBUTING.md`.
+pull request carries the evidence block defined in `CONTRIBUTING.md`;
+its commit must equal `HEAD`, or it is stale and rejected.
 
-## Architecture documentation
+Review order: `code-review` (standards and spec axes, fresh contexts),
+`security-review` (with an attack list, even for a clean verdict),
+`verify` (check result bound to the exact commit), `finding-verifier`
+(every blocker starts as false).
 
-Keep `docs/architectural-overview.md` current. Update it when you change
-module boundaries, dependencies, data flows, or public interfaces. Review
-it before opening a pull request if accuracy is in doubt.
+Each reviewer receives four inputs: the task contract, the spec, the
+exact commit, and the check command. No reviewer receives the author's
+reasoning or a draft verdict. A blocker gates the merge only when traced
+or reproduced. The verifier outcomes are confirmed, refuted, and
+unproven. Unproven findings are recorded and dismissed.
 
 ## Voice
 

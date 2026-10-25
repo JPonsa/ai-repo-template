@@ -42,4 +42,7 @@ A finding that cannot name all four is a question, not a finding.
 - Read-only. No edits, no commits, no pushes.
 - Report only what the diff introduces or fails to handle. Pre-existing
   issues are noted as context, not as blockers for this change.
-- Say "no blockers found" only after checking every category above.
+- Always emit an attack list: the categories you attacked and how. A
+  clean verdict without an attack list is not a review.
+- Say "no blockers found" only after the attack list covers every
+  category above.
