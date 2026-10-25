@@ -109,13 +109,8 @@ Review runs on three axes:
 
 Each axis runs in a fresh context. A reviewer receives the task contract,
 the spec, the exact commit, and the check command. A reviewer does not
-receive the author's reasoning or a proposed verdict.
-
-The review order is: `code-review` (standards and spec axes),
-`security-review` (with an attack list, even for a clean verdict),
-`verify` (check result against the exact commit), then
-`finding-verifier` (challenges every blocker, starting from the
-position that it is false).
+receive the author's reasoning or a proposed verdict. The review order
+is stated once, in `AGENTS.md`.
 
 A blocker must be traced or reproduced before it can block a merge. The
 verifier returns one of three outcomes: **confirmed**, **refuted**, or

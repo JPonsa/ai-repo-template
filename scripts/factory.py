@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import fnmatch
+import os
 import re
 import subprocess
 import sys
@@ -243,8 +244,8 @@ def resolve_link(source: Path, target: str, bundle: Path) -> Path:
     return (source.parent / target).resolve()
 
 
-def cmd_docs(args: argparse.Namespace) -> int:
-    """Validate the OKF bundle and report every problem it finds."""
+def docs_findings() -> tuple[list[str], list[str], int]:
+    """Validate the OKF bundle. Return errors, warnings, concept count."""
     settings = load_config().get("docs", {})
     bundle = ROOT / settings.get("bundle", "docs")
     version = settings.get("okf_version", "0.2")
@@ -324,6 +325,12 @@ def cmd_docs(args: argparse.Namespace) -> int:
                 if not resolved.exists():
                     errors.append(f"{relative}:{line_number}: broken link '{target}'")
 
+    return errors, warnings, concepts
+
+
+def cmd_docs(args: argparse.Namespace) -> int:
+    """Validate the OKF bundle and report every problem it finds."""
+    errors, warnings, concepts = docs_findings()
     for warning in warnings:
         print(f"warn: {warning}")
     for error in errors:
@@ -490,21 +497,24 @@ def cmd_risk(args: argparse.Namespace) -> int:
 
 
 def _skill_search_paths() -> list[Path]:
-    """Return candidate global skill directories for different harnesses."""
+    """Return candidate global skill directories for different harnesses.
+
+    Extra machine-specific directories come from the
+    ``FACTORY_SKILL_PATHS`` environment variable, colon-separated.
+    Use it when the global skill directory lives outside ``$HOME``,
+    for example under a Windows profile mounted in WSL.
+    """
     home = Path.home()
     paths = [
         home / ".claude" / "skills",
         home / ".config" / "opencode" / "skills",
         home / ".local" / "share" / "opencode" / "skills",
         home / ".agents" / "skills",
+        home / ".claude" / "plugins",
+        home / ".config" / "claude" / "plugins",
     ]
-    # Also check common plugin/cache locations
-    paths.extend(
-        [
-            home / ".claude" / "plugins",
-            home / ".config" / "claude" / "plugins",
-        ]
-    )
+    extra = os.environ.get("FACTORY_SKILL_PATHS", "")
+    paths.extend(Path(part) for part in extra.split(":") if part)
     return paths
 
 
@@ -535,53 +545,202 @@ def _find_skill(skill_id: str, paths: list[Path]) -> bool:
     return False
 
 
+def _prose_lines(path: Path) -> set[str]:
+    """Return normalized non-trivial prose lines, excluding code fences."""
+    lines: set[str] = set()
+    in_fence = False
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        if raw.lstrip().startswith(("```", "~~~")):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        stripped = raw.strip()
+        if len(stripped) < 40 or stripped.startswith(("#", "|", "-", "*", ">")):
+            continue
+        lines.add(" ".join(stripped.split()))
+    return lines
+
+
+def _duplicated_instructions() -> list[str]:
+    """Report identical instruction lines shared by the contract files."""
+    files = ["AGENTS.md", "CONTRIBUTING.md", "CODING_STANDARDS.md"]
+    corpora: dict[str, set[str]] = {}
+    for name in files:
+        path = ROOT / name
+        if path.is_file():
+            corpora[name] = _prose_lines(path)
+    findings: list[str] = []
+    names = list(corpora)
+    for i, left in enumerate(names):
+        for right in names[i + 1 :]:
+            shared = corpora[left] & corpora[right]
+            for line in sorted(shared):
+                findings.append(
+                    f"instruction duplicated in {left} and {right}: \"{line}\""
+                )
+    return findings
+
+
+def _normalize_permission(value: str) -> str:
+    """Normalize a permission pattern for drift comparison."""
+    value = value.lower().replace(" ", "")
+    return value.strip("*")
+
+
+TOOL_MAP = {"shell": "bash", "read": "read", "edit": "edit"}
+
+
+def _opencode_rules() -> list[tuple[str, str, str]]:
+    """Read permission rules from .opencode/opencode.jsonc."""
+    path = ROOT / ".opencode" / "opencode.jsonc"
+    if not path.is_file():
+        return []
+    text = path.read_text(encoding="utf-8")
+    # Strip // comments so the JSONC parses as JSON.
+    cleaned = re.sub(r"^\s*//.*$", "", text, flags=re.M)
+    import json
+
+    try:
+        data = json.loads(cleaned)
+    except ValueError:
+        return []
+    rules: list[tuple[str, str, str]] = []
+    for rule in data.get("permissions", []):
+        action, resource, effect = rule.get("action", ""), rule.get("resource", ""), rule.get("effect", "")
+        if action in TOOL_MAP and resource != "*":
+            rules.append((TOOL_MAP[action], _normalize_permission(resource), effect))
+    return rules
+
+
+def _claude_rules() -> dict[str, list[tuple[str, str]]]:
+    """Read permission rules from .claude/settings.json."""
+    path = ROOT / ".claude" / "settings.json"
+    if not path.is_file():
+        return {}
+    import json
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return {}
+    rules: dict[str, list[tuple[str, str]]] = {}
+    permissions = data.get("permissions", {})
+    for effect, patterns in permissions.items():
+        if not isinstance(patterns, list):
+            continue
+        for pattern in patterns:
+            match = re.match(r"([A-Za-z]+)\((.*)\)$", pattern)
+            if not match:
+                continue
+            tool, resource = match.group(1).lower(), match.group(2)
+            rules.setdefault(tool, []).append(
+                (resource.lower().replace(" ", "").strip("*"), effect)
+            )
+    return rules
+
+
+def _permission_drift() -> list[str]:
+    """Report permission rules present in one harness but not the other."""
+    findings: list[str] = []
+    opencode = _opencode_rules()
+    claude = _claude_rules()
+    claude_flat = [(tool, res, eff) for tool, pairs in claude.items() for res, eff in pairs]
+
+    def has_counterpart(rule: tuple[str, str, str], pool: list[tuple[str, str, str]]) -> bool:
+        tool, resource, _ = rule
+        return any(
+            other_tool == tool
+            and (other_res.startswith(resource) or resource.startswith(other_res))
+            for other_tool, other_res, _ in pool
+        )
+
+    for tool, resource, effect in opencode:
+        if not has_counterpart((tool, resource, effect), claude_flat):
+            findings.append(
+                f"permission drift: opencode rule {tool} '{resource}' ({effect}) "
+                "has no counterpart in .claude/settings.json"
+            )
+    for tool, resource, effect in claude_flat:
+        if not has_counterpart((tool, resource, effect), opencode):
+            findings.append(
+                f"permission drift: claude rule {tool} '{resource}' ({effect}) "
+                "has no counterpart in .opencode/opencode.jsonc"
+            )
+    return findings
+
+
+def _unreferenced_skills() -> list[str]:
+    """Report local skills that no command file or contract document names."""
+    config = load_config()
+    local = list(config.get("skills", {}).get("local", []))
+    if not local:
+        return []
+    corpus: list[str] = []
+    commands_dir = ROOT / ".opencode" / "commands"
+    if commands_dir.is_dir():
+        corpus.extend(
+            p.read_text(encoding="utf-8") for p in commands_dir.glob("*.md")
+        )
+    for name in ("AGENTS.md", "CONTRIBUTING.md", "README.md", "TEMPLATE.md"):
+        path = ROOT / name
+        if path.is_file():
+            corpus.append(path.read_text(encoding="utf-8"))
+    blob = "\n".join(corpus)
+    return [
+        skill
+        for skill in local
+        if skill not in blob
+    ]
+
+
 def cmd_audit(args: argparse.Namespace) -> int:
-    """Report prerequisite skills and basic harness drift."""
+    """Report harness drift: prerequisites, docs, references, duplication, permissions."""
     config = load_config()
     prereqs = config.get("prerequisites", {})
     required = list(prereqs.get("required", []))
     optional = list(prereqs.get("optional", []))
     upstream = prereqs.get("upstream", "mattpocock/skills")
-    version = prereqs.get("version")
-    commit = prereqs.get("commit")
 
     print(f"upstream: {upstream}")
-    if version:
-        print(f"version:  {version}")
-    if commit:
-        print(f"commit:   {commit}")
 
+    findings: list[str] = []
+
+    # 1. Prerequisite skills that are missing on this machine.
     paths = _skill_search_paths()
-    print("search paths:")
-    for p in paths:
-        print(f"  - {p} ({'exists' if p.exists() else 'missing'})")
-
-    missing_required = []
-    found_required = []
     for skill_id in required:
         if _find_skill(skill_id, paths):
-            found_required.append(skill_id)
             print(f"found (required): {skill_id}")
         else:
-            missing_required.append(skill_id)
             print(f"missing (required): {skill_id}")
-
+            findings.append(
+                f"prerequisite skill missing: {skill_id} "
+                "(install it globally; never reimplement it inline)"
+            )
     for skill_id in optional:
-        if _find_skill(skill_id, paths):
-            print(f"found (optional): {skill_id}")
-        else:
-            print(f"missing (optional): {skill_id}")
+        status = "found" if _find_skill(skill_id, paths) else "missing"
+        print(f"{status} (optional): {skill_id}")
 
-    if missing_required:
-        print(
-            "\nwarning: missing required upstream skills. "
-            "Install them globally as per README/TEMPLATE. "
-            "A missing skill is an install error - do not reimplement inline.",
-            file=sys.stderr,
-        )
-        return 0  # warnings, not failures per issue
-    print("\nall required upstream skills found")
-    return 0
+    # 2-4. Docs bundle: frontmatter, types, links, staleness.
+    errors, warnings, concepts = docs_findings()
+    print(f"docs: {concepts} concept(s), {len(errors)} error(s), {len(warnings)} warning(s)")
+    findings.extend(f"docs: {error}" for error in errors)
+    findings.extend(f"docs: {warning}" for warning in warnings)
+
+    # 5. Skills that nothing references.
+    for skill in _unreferenced_skills():
+        findings.append(f"skill '{skill}' is referenced by no command or document")
+
+    # 6. Instructions duplicated between contract files.
+    findings.extend(_duplicated_instructions())
+
+    # 7. Permission drift between the harnesses.
+    findings.extend(_permission_drift())
+
+    for finding in findings:
+        print(f"fail: audit: {finding}", file=sys.stderr)
+    print(f"audit: {len(findings)} finding(s)")
+    return 1 if findings else 0
 
 
 # --------------------------------------------------------------------------

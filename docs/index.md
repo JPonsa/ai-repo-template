@@ -41,6 +41,7 @@ folder name equal to the plural of the type.
 * `runbooks/` - repeatable operational steps.
 * `research/` - findings from sources, with provenance.
 * `metrics/` - definitions and formulas.
+  The set the factory tracks is [factory.md](metrics/factory.md).
 * `retros/` - what changed after a piece of work.
 * `playbooks/` - multi-step procedures that are not tied to operations.
 * `how-to/` - task-focused guides for common procedures.
