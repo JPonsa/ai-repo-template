@@ -79,7 +79,9 @@ Use this repository as a GitHub template. Do **not** clone it directly.
 ├── scripts/factory.py     # check | docs | risk | audit
 ├── docs/                  # OKF v0.2 knowledge bundle
 ├── .claude/skills/        # local skills, read by both harnesses
+├── .claude/settings.json  # Claude Code permission rules
 ├── .opencode/commands/    # OpenCode slash-command adapters
+├── .opencode/opencode.jsonc # OpenCode permission rules
 └── .github/               # CI and templates
 ```
 

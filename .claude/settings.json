@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(uv run scripts/factory.py*)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Read(.env*)",
+      "Read(**/secrets/**)",
+      "Edit(.opencode/**)",
+      "Edit(.claude/**)",
+      "Edit(AGENTS.md)",
+      "Edit(CODING_STANDARDS.md)",
+      "Edit(CONTRIBUTING.md)",
+      "Edit(factory.toml)",
+      "Edit(scripts/factory.py)"
+    ]
+  }
+}
