@@ -1,85 +1,99 @@
-# Project title <a name = "top"></a>
+# Agent software-factory template
 
+> **Template.** Read [TEMPLATE.md](TEMPLATE.md) before you change
+> anything, then run the `setup-project` skill. That skill rewrites this
+> file for the new project.
 
+A minimal starting repository for projects built with coding agents.
 
-## 📝 Table of Contents
-- [About](#about)
-- [Getting Started](#getting_started)
-- [Development](#dev_guide)
-- [Usage](#usage)
-- [Authors](#authors)
-- [Acknowledgments](#acknowledgement)
+It ships the durable contracts, the workflow, the guardrails, and the
+knowledge format. It does not ship a framework, and it does not ship
+third-party skills. Those are installed once, globally, and recorded as
+prerequisites.
 
+## What you get
 
+- One instruction router, `AGENTS.md`, that both OpenCode and Claude Code
+  read.
+- Domain contracts: `INTENT.md`, `CONTEXT.md`, `GLOSSARY.md`, and
+  `CODING_STANDARDS.md`.
+- A workflow built on `mattpocock/skills`: grill, spec, tickets,
+  implementation, test-driven development, review, pull request, retro.
+- A knowledge bundle in `docs/`, using Open Knowledge Format v0.2.
+- One check entry point, `scripts/factory.py`, with a risk gate that
+  decides whether an agent may merge.
+- Five local skills in `.claude/skills/`, read by both harnesses.
 
-## ❔ About <a name = "about"></a>
+## Prerequisites
 
-Introduction to project aims and requirements and any high-level information that adds useful context.
+| Tool | Version | Why |
+| --- | --- | --- |
+| `git` | any current version | version control |
+| `uv` | 0.12 or later | runs `scripts/factory.py` |
+| `gh` | any current version, authenticated | issues, pull requests, CI |
+| `mattpocock/skills` | 1.3.1 | the workflow skills |
 
-You can add a paragraph about how the repo is organized.
+An agent harness is also required: OpenCode or Claude Code.
 
+### Install the global skills
 
+Install them once, for your harness, in a global skill directory.
 
-## ⚙️ Getting Started <a name = "getting_started"></a>
+Claude Code:
 
-These instructions will get you a copy of the project up and running for development and/or reproducing all results.
-
-
-### Prerequisites
-* Access to a particular environment?
-* Hardware specs or software versions are essential?
-
-
-### Initial setup
-
-**1.** Step by step guide to recreate the environment
-
-```
-# Use code blocks to show specific commands
-```
-
-**2.** Step 2
-
-```
-# Step 2
-```
-
-**3.** Step 3
-
-```
-# Step 3
+```bash
+claude plugin install mattpocock-skills@claude-plugins-official
 ```
 
-**4.** (Optional) Useful but not critical steps
+OpenCode or another agent:
 
-```
-# Commands for optional steps
-```
-
-
-
-## 🔧 Development guide <a name = "dev_guide"></a>
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for writing style, file structure, and contribution rules.
-
-## 🚀 Usage <a name="usage"></a>
-
-To recreate all outputs...
-
-```
-# Commands to recreate outputs
+```bash
+npx skills@latest add mattpocock/skills -a opencode
 ```
 
-## ✍️ Authors <a name = "authors"></a>
+The tested pin is plugin 1.3.1 at commit
+`5beb35b040e3de97e54fa9e386d7e42d15c295c2`. It is recorded in
+`factory.toml` with the list of required skills. See
+[TEMPLATE.md](TEMPLATE.md) for the discovery paths and the harness
+differences.
 
-- [Author 1](https://wd3.myworkday.com/astrazeneca/d/inst/15$125135/247$157550.htmld)
-- [Author 2](https://wd3.myworkday.com/astrazeneca/d/inst/15$125135/247$157550.htmld)
+## Quick start
 
+```bash
+git clone <this-repository> my-project
+cd my-project
+uv run scripts/factory.py check
+```
 
+Then start your agent and run the `setup-project` skill. It asks for the
+project identity, the stack, and the check command, writes the contracts,
+and deletes `TEMPLATE.md`.
 
-## 🎉 Acknowledgements <a name = "acknowledgement"></a>
+## Layout
 
-- Help from non-developer contributions.
+```text
+.
+├── AGENTS.md              # instruction router for both harnesses
+├── TEMPLATE.md            # instantiation guide; deleted on setup
+├── factory.toml           # check command, risk paths, labels, doc types
+├── scripts/factory.py     # check | docs | risk | audit
+├── docs/                  # OKF v0.2 knowledge bundle
+├── .claude/skills/        # local skills, read by both harnesses
+├── .opencode/commands/    # OpenCode slash-command adapters
+└── .github/               # CI and templates
+```
 
+## The loop
 
-[\[Back to top\]](#top)
+1. Grill the idea and record hard decisions.
+2. Write a spec as an issue.
+3. Split the spec into tickets with blocking edges.
+4. Implement one ticket in a fresh context, with a test.
+5. Verify the check on the exact commit.
+6. Review standards, spec, and security in fresh contexts.
+7. Merge, when the risk gate allows it.
+8. Record the retro and the log entry.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
