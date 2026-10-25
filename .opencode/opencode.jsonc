@@ -1,0 +1,32 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Permission policy for this repository. The same policy is stated in
+  // .claude/settings.json for Claude Code. CI remains the real
+  // enforcement layer; these rules only decide what asks.
+  "permissions": [
+    // Destructive shell commands ask. Specific read-only and factory
+    // commands follow, because the last matching rule wins.
+    { "action": "shell", "resource": "*", "effect": "ask" },
+    { "action": "shell", "resource": "git status *", "effect": "allow" },
+    { "action": "shell", "resource": "git diff *", "effect": "allow" },
+    { "action": "shell", "resource": "git log *", "effect": "allow" },
+    { "action": "shell", "resource": "git show *", "effect": "allow" },
+    { "action": "shell", "resource": "uv run scripts/factory.py *", "effect": "allow" },
+    // Pushes ask, force pushes included.
+    { "action": "shell", "resource": "git push *", "effect": "ask" },
+    // Secret files ask on read.
+    { "action": "read", "resource": "*.env", "effect": "ask" },
+    { "action": "read", "resource": "*.env.*", "effect": "ask" },
+    { "action": "read", "resource": "**/secrets/**", "effect": "ask" },
+    // Harness contract paths ask on edit. Reviewers cannot edit them
+    // silently; a human sees every change to the files that change
+    // every future change.
+    { "action": "edit", "resource": ".opencode/**", "effect": "ask" },
+    { "action": "edit", "resource": ".claude/**", "effect": "ask" },
+    { "action": "edit", "resource": "AGENTS.md", "effect": "ask" },
+    { "action": "edit", "resource": "CODING_STANDARDS.md", "effect": "ask" },
+    { "action": "edit", "resource": "CONTRIBUTING.md", "effect": "ask" },
+    { "action": "edit", "resource": "factory.toml", "effect": "ask" },
+    { "action": "edit", "resource": "scripts/factory.py", "effect": "ask" }
+  ]
+}
