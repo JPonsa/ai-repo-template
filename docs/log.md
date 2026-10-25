@@ -4,6 +4,8 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
 
 ## 2026-10-25
 
+* **Change**: Extended `factory.py audit` to the full drift report and
+  added the metrics document (#9).
 * **Change**: Added the risk gate, stack detection in `check`, CI, and
   issue templates (#8).
 * **Creation**: Added a decision record: the owner's merge is the human
