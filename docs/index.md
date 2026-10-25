@@ -19,6 +19,7 @@ and keep the OKF bundle for other durable knowledge.
 # Decisions
 
 * [Use OKF v0.2 for the docs bundle](decisions/0001-use-okf-for-docs-bundle.md) - Why `docs/` carries typed frontmatter and root documents do not.
+* [The owner's merge is the human approval](decisions/0002-owner-merge-is-human-approval.md) - Why high-risk pull requests merge red in a solo-owner repository.
 
 # Project documents
 

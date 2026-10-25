@@ -1,0 +1,36 @@
+name: Bug
+description: Report reproducible broken behaviour
+labels: ["needs-triage"]
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed behaviour
+      description: What happened. Include the exact command and output.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: What should have happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Ordered steps from a clean checkout to the failure.
+      value: |
+        1.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: The check that proves the bug is fixed.
+      value: |
+        - [ ]
+    validations:
+      required: true

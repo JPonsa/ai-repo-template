@@ -107,6 +107,35 @@ def matches(path: str, patterns: list[str]) -> bool:
 # --------------------------------------------------------------------------
 
 
+def detect_stack_commands() -> list[str]:
+    """Guess the project's own test command from its markers.
+
+    Used only when ``factory.toml`` configures no commands. The detected
+    command is a starting point, not a contract: ``setup-project`` writes
+    the real command into ``factory.toml``.
+    """
+    commands: list[str] = []
+    if (ROOT / "pyproject.toml").is_file() or (ROOT / "uv.lock").is_file():
+        commands.append("uv run pytest")
+    elif any(ROOT.glob("requirements*.txt")):
+        commands.append("python -m pytest")
+    package = ROOT / "package.json"
+    if package.is_file():
+        try:
+            import json
+
+            scripts = json.loads(package.read_text(encoding="utf-8")).get("scripts", {})
+            if "test" in scripts:
+                commands.append("npm test")
+        except (OSError, ValueError):
+            pass
+    if (ROOT / "go.mod").is_file():
+        commands.append("go test ./...")
+    if (ROOT / "Cargo.toml").is_file():
+        commands.append("cargo test")
+    return commands
+
+
 def cmd_check(args: argparse.Namespace) -> int:
     """Run every configured check and fail closed when nothing runs."""
     settings = load_config().get("check", {})
@@ -121,6 +150,10 @@ def cmd_check(args: argparse.Namespace) -> int:
         if matches(path, source_patterns) and not matches(path, ignored_patterns)
     ]
     commands = settings.get("commands", [])
+    if not commands:
+        commands = detect_stack_commands()
+        if commands:
+            print("note:  no commands configured; detected the project stack")
 
     print(f"commit: {git('rev-parse', 'HEAD')}")
     if base:
@@ -129,7 +162,7 @@ def cmd_check(args: argparse.Namespace) -> int:
 
     if source_changed and not commands:
         print(
-            "fail: source changed but factory.toml configures no check commands",
+            "fail: source changed but no check command is configured or detected",
             file=sys.stderr,
         )
         return 1
@@ -305,9 +338,155 @@ def cmd_docs(args: argparse.Namespace) -> int:
 # --------------------------------------------------------------------------
 
 
+EVIDENCE_BLOCK_RE = re.compile(
+    r"<!--\s*factory:evidence\s*\n(.*?)-->", re.S
+)
+
+
+def parse_evidence_block(text: str) -> dict[str, str] | None:
+    """Parse the ``factory:evidence`` comment from a pull-request body."""
+    match = EVIDENCE_BLOCK_RE.search(text)
+    if not match:
+        return None
+    fields: dict[str, str] = {}
+    for line in match.group(1).splitlines():
+        key, separator, value = line.partition(":")
+        if separator:
+            fields[key.strip()] = value.strip()
+    return fields
+
+
+def gh_json(fields: str, *args: str) -> dict | None:
+    """Run a read-only gh command and return its JSON, or None."""
+    result = subprocess.run(
+        ["gh", *args, "--json", fields],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    try:
+        import json
+
+        return json.loads(result.stdout)
+    except ValueError:
+        return None
+
+
 def cmd_risk(args: argparse.Namespace) -> int:
-    """Classify a diff. Implemented by the enforcement ticket."""
-    raise FactoryError("risk: not implemented yet")
+    """Classify the diff as low risk or high risk. Fail on high risk."""
+    config = load_config()
+    risk = config.get("risk", {})
+    labels_cfg = config.get("labels", {})
+    protected = list(risk.get("protected_paths", []))
+    max_files = int(risk.get("max_files", 20))
+    max_added_lines = int(risk.get("max_added_lines", 600))
+    risk_high_label = labels_cfg.get("risk_high", "risk:high")
+
+    base = resolve_base(args.base or config.get("check", {}).get("base"))
+    merge_base = None
+    if base:
+        merge_base = git("merge-base", base, "HEAD", check=False)
+    if not merge_base:
+        print("fail: risk: no base ref to compare against", file=sys.stderr)
+        return 1
+
+    # Committed diff against the merge base.
+    changed = [
+        path
+        for path in git(
+            "diff", "--name-only", f"{merge_base}..HEAD", check=False
+        ).splitlines()
+        if path
+    ]
+    numstat = git("diff", "--numstat", f"{merge_base}..HEAD", check=False)
+    added = 0
+    for line in numstat.splitlines():
+        first = line.split()[0] if line.split() else ""
+        if first.isdigit():
+            added += int(first)
+
+    print(f"commit: {git('rev-parse', 'HEAD')}")
+    print(f"change: {len(changed)} file(s), {added} added line(s)")
+
+    failures: list[str] = []
+    high_reasons: list[str] = []
+
+    # Rule 1: protected paths.
+    touched_protected = [path for path in changed if matches(path, protected)]
+    if touched_protected:
+        for path in touched_protected:
+            print(f"risk:  protected path changed: {path}")
+        high_reasons.append("protected paths")
+
+    # Rule 2: size ceiling.
+    if len(changed) > max_files or added > max_added_lines:
+        print(
+            f"risk:  diff exceeds the ceiling: {len(changed)} file(s) > {max_files}, "
+            f"{added} added line(s) > {max_added_lines}"
+        )
+        high_reasons.append("diff size")
+
+    # Rule 3: evidence block, from the pull request for this branch.
+    pr = gh_json("body,labels,reviews,author", "pr", "view")
+    head = git("rev-parse", "HEAD")
+    evidence = parse_evidence_block(pr.get("body", "")) if pr else None
+    if not pr:
+        failures.append("no pull request found for this branch; the gate cannot read the evidence")
+    elif not evidence:
+        failures.append("pull request has no factory:evidence block")
+    else:
+        evidence_commit = evidence.get("commit", "")
+        if evidence_commit != head:
+            failures.append(
+                f"evidence commit {evidence_commit[:12] or '(missing)'} does not equal HEAD {head[:12]}"
+            )
+        else:
+            print("risk:  evidence block matches HEAD")
+
+    # Rule 4: the risk:high label and human approval.
+    label_present = False
+    approved_by: list[str] = []
+    if pr:
+        pr_labels = [label.get("name", "") for label in pr.get("labels", [])]
+        label_present = risk_high_label in pr_labels
+        pr_author = (pr.get("author") or {}).get("login", "")
+        approved_by = [
+            (review.get("author") or {}).get("login", "")
+            for review in pr.get("reviews", [])
+            if review.get("state") == "APPROVED"
+            and (review.get("author") or {}).get("login", "") != pr_author
+        ]
+
+    if label_present and not approved_by:
+        failures.append(f"labelled {risk_high_label} without human approval")
+
+    # Verdict. A structurally high-risk diff passes only when it is
+    # labelled risk:high and a human has approved it. Evidence problems
+    # and an unapproved risk:high label are never excused.
+    if failures:
+        for failure in failures:
+            print(f"fail: risk: {failure}", file=sys.stderr)
+    if high_reasons:
+        if label_present and approved_by:
+            print(
+                f"result: risk is high ({'; '.join(high_reasons)}), "
+                f"approved by {', '.join(approved_by)}"
+            )
+            return 0
+        for reason in high_reasons:
+            print(
+                f"fail: risk: high risk ({reason}); label '{risk_high_label}' "
+                "and obtain human approval to merge",
+                file=sys.stderr,
+            )
+        return 1
+    if failures:
+        return 1
+    print("result: risk is low")
+    return 0
 
 
 def _skill_search_paths() -> list[Path]:
@@ -479,11 +658,17 @@ def build_parser() -> argparse.ArgumentParser:
     risk = commands.add_parser(
         "risk",
         help="classify the current diff",
-        description="Classify a diff as low risk or high risk (not implemented yet).",
+        description=(
+            "Classify the diff as low risk or high risk. Fails when a "
+            "protected path changed, the diff exceeds the size ceiling, the "
+            "evidence block is missing or stale, or the pull request is "
+            "labelled risk:high without human approval. A high-risk diff "
+            "passes only when labelled risk:high and approved by a human."
+        ),
     )
     risk.add_argument(
         "--base",
-        help="git ref to compare against (for future use)",
+        help="git ref to compare against (default: [check].base or origin/main)",
     )
     risk.set_defaults(handler=cmd_risk)
 
