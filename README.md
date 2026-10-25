@@ -1,15 +1,15 @@
-# Agent software-factory template
+# <project-name>
 
 > **Template.** Read [TEMPLATE.md](TEMPLATE.md) before you change
 > anything, then run the `setup-project` skill. That skill rewrites this
 > file for the new project.
 
-A minimal starting repository for projects built with coding agents.
+<one or two sentences describing the purpose of this project and its primary consumers.>
 
-It ships the durable contracts, the workflow, the guardrails, and the
-knowledge format. It does not ship a framework, and it does not ship
-third-party skills. Those are installed once, globally, and recorded as
-prerequisites.
+This repository follows the agent software-factory pattern. It ships the
+durable contracts, the workflow, the guardrails, and the knowledge format.
+It does not ship a framework, and it does not ship third-party skills.
+Those are installed once, globally, and recorded as prerequisites.
 
 ## What you get
 
@@ -59,15 +59,15 @@ differences.
 
 ## Quick start
 
-```bash
-git clone <this-repository> my-project
-cd my-project
-uv run scripts/factory.py check
-```
+Use this repository as a GitHub template. Do **not** clone it directly.
 
-Then start your agent and run the `setup-project` skill. It asks for the
-project identity, the stack, and the check command, writes the contracts,
-and deletes `TEMPLATE.md`.
+1. Click **Use this template** → **Create a new repository**.
+2. Clone the new repository to your machine.
+3. Install the global skills listed in [Prerequisites](#prerequisites).
+4. Run `uv run scripts/factory.py check` to verify the template baseline.
+5. Start your agent and run the `setup-project` skill. It asks for the
+   project identity, the stack, and the check command, writes the
+   contracts, and deletes `TEMPLATE.md`.
 
 ## Layout
 

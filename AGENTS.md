@@ -4,6 +4,18 @@ These instructions apply to the whole repository. A deeper `AGENTS.md`
 overrides them. Read `INTENT.md` for purpose and scope, and `CONTEXT.md`
 and `GLOSSARY.md` for domain language.
 
+## Always-relevant context
+
+### Project identity
+
+Mirror the Purpose and Primary consumers from `INTENT.md`. Use one or
+two sentences. Do not copy large sections of `README.md` here.
+
+### Technology snapshot
+
+List the languages, frameworks, package managers, and the real check
+command. Link to `CONTRIBUTING.md` for setup details.
+
 ## Where to look
 
 | Need | Read |
@@ -54,6 +66,12 @@ decides. Never judge your own diff as low risk.
 A change is not done until the check passes on the exact commit. Every
 pull request states the commit, the command, and the result in the
 evidence block defined in `CONTRIBUTING.md`.
+
+## Architecture documentation
+
+Keep `docs/architectural-overview.md` current. Update it when you change
+module boundaries, dependencies, data flows, or public interfaces. Review
+it before opening a pull request if accuracy is in doubt.
 
 ## Voice
 

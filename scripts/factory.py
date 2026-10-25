@@ -323,22 +323,87 @@ def cmd_audit(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="factory",
-        description="Check and audit this repository.",
+        description=(
+            "The software factory: one entry point for checking and auditing "
+            "this repository."
+        ),
+        epilog=(
+            "Examples:\n"
+            "  uv run scripts/factory.py check\n"
+            "  uv run scripts/factory.py check --base origin/main\n"
+            "  uv run scripts/factory.py docs\n"
+            "  uv run scripts/factory.py risk\n"
+            "  uv run scripts/factory.py risk --base main\n"
+            "  uv run scripts/factory.py audit\n"
+            "\n"
+            "Configuration is read from factory.toml. "
+            "`check` fails closed when source changes but no checks are configured. "
+            "`docs` validates the OKF bundle under docs/."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     commands = parser.add_subparsers(dest="command", required=True)
 
-    check = commands.add_parser("check", help="run the configured checks")
-    check.add_argument("--base", help="git ref to compare against")
+    check = commands.add_parser(
+        "check",
+        help="run the configured checks",
+        description=(
+            "Run every command in [check].commands in order. If source files "
+            "changed relative to the base ref and no commands are configured, "
+            "this command fails closed."
+        ),
+        epilog=(
+            "Notes:\n"
+            "  - Base ref resolution: --base, then [check].base, then origin/main, "
+            "main, HEAD~1.\n"
+            "  - Source detection uses [check].source_paths and ignores "
+            "[check].ignored_paths.\n"
+            "  - Prints the commit, base, and change counts before running."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    check.add_argument(
+        "--base",
+        help="git ref to compare against (default: [check].base or origin/main)",
+    )
     check.set_defaults(handler=cmd_check)
 
-    docs = commands.add_parser("docs", help="validate the OKF bundle")
+    docs = commands.add_parser(
+        "docs",
+        help="validate the OKF bundle",
+        description=(
+            "Validate the OKF bundle under docs/. Checks frontmatter, required "
+            "fields, allowed types, stale_after dates, reserved files, and "
+            "broken internal links."
+        ),
+        epilog=(
+            "Notes:\n"
+            "  - Bundle path and version from [docs] in factory.toml.\n"
+            "  - Only non-reserved files require frontmatter with a type.\n"
+            "  - Frontmatter is a minimal key: value parser (not full YAML)."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
     docs.set_defaults(handler=cmd_docs)
 
-    risk = commands.add_parser("risk", help="classify the current diff")
-    risk.add_argument("--base", help="git ref to compare against")
+    risk = commands.add_parser(
+        "risk",
+        help="classify the current diff",
+        description="Classify a diff as low risk or high risk (not implemented yet).",
+    )
+    risk.add_argument(
+        "--base",
+        help="git ref to compare against (for future use)",
+    )
     risk.set_defaults(handler=cmd_risk)
 
-    audit = commands.add_parser("audit", help="report harness drift")
+    audit = commands.add_parser(
+        "audit",
+        help="report harness drift",
+        description=(
+            "Report drift across the harness (not implemented yet)."
+        ),
+    )
     audit.set_defaults(handler=cmd_audit)
 
     return parser
