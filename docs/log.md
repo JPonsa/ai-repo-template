@@ -23,3 +23,6 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
   logging rule no longer closes the agent lane (#19).
 * **Creation**: Recorded the research on the mattpocock
   software-factory-skill branch with per-feature recommendations (#19).
+* **Change**: Aligned the factory vocabulary with the upstream
+  software-factory skill: glossary terms for the three brakes, the
+  ticket tracker, the ticket source, and the ratchet (#19).
