@@ -20,6 +20,7 @@ and keep the OKF bundle for other durable knowledge.
 
 * [Use OKF v0.2 for the docs bundle](decisions/0001-use-okf-for-docs-bundle.md) - Why `docs/` carries typed frontmatter and root documents do not.
 * [The owner's merge is the human approval](decisions/0002-owner-merge-is-human-approval.md) - Why high-risk pull requests merge red in a solo-owner repository.
+* [The update log is not a protected path](decisions/0003-the-log-is-not-a-protected-path.md) - Why the logging rule no longer closes the agent lane.
 
 # Project documents
 

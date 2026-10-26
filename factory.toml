@@ -67,7 +67,6 @@ protected_paths = [
   "scripts/factory.py",
   "LICENSE",
   "docs/index.md",
-  "docs/log.md",
   "Dockerfile*",
   "docker-compose*.yml",
   "infra/**",

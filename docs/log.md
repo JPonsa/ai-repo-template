@@ -19,3 +19,5 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
 * **Change**: Fixed the friction the dry run found — path-based reserved
   docs, CI risk-gate and secret-scan fixes, setup-project setup steps,
   and TEMPLATE.md expectations (#9).
+* **Change**: Removed the update log from the protected paths: the
+  logging rule no longer closes the agent lane (#19).
