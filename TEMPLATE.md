@@ -51,6 +51,24 @@ Claude Code exposes each skill as `/name`. OpenCode exposes the ID as
 `@skill-id`, because it has no automatic slash command for a skill. This
 template adds slash commands only for the five local skills.
 
+If your global skill directory lives outside `$HOME` — for example
+under a Windows profile mounted in WSL — export
+`FACTORY_SKILL_PATHS` with the extra directories, colon-separated.
+`factory.py audit` searches them when it looks for installed skills.
+
+## What to expect in the first tickets
+
+The ticket that adds the project's dependency manifest
+(`pyproject.toml`, `uv.lock`, `package.json`, lock files) is always
+high risk, because a manifest changes every future change. Label it
+`risk:high` and let the owner approve it once. Later tickets are low
+risk again.
+
+Fixing CI on a pull request has the same shape: the workflow file is
+a protected path, and the fix commit invalidates the pull request's own
+evidence block. Land CI fixes on `main` directly, with the owner's
+approval, and keep pull requests single-purpose.
+
 ## The first session
 
 Start the agent in this directory and run the `setup-project` skill. It

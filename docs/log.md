@@ -13,3 +13,9 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
 * **Creation**: Added `scripts/factory.py` with `check` and `docs`, the
   OKF bundle, and the instruction router (#3).
 * **Change**: Normalised line endings and added `.gitattributes` (#2).
+
+## 2026-10-26
+
+* **Change**: Fixed the friction the dry run found — path-based reserved
+  docs, CI risk-gate and secret-scan fixes, setup-project setup steps,
+  and TEMPLATE.md expectations (#9).

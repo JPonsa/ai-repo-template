@@ -274,7 +274,11 @@ def docs_findings() -> tuple[list[str], list[str], int]:
     for path in sorted(bundle.rglob("*.md")):
         relative = path.relative_to(ROOT).as_posix()
         text = path.read_text(encoding="utf-8")
-        is_reserved = path.name in reserved
+        # Reserved entries match either a bare file name anywhere in the
+        # bundle or a path relative to the bundle root, so generated
+        # subdirectories such as docs/agents/ can be reserved as a whole.
+        bundle_relative = path.relative_to(bundle).as_posix()
+        is_reserved = path.name in reserved or bundle_relative in reserved
 
         if not is_reserved:
             concepts += 1
@@ -437,7 +441,14 @@ def cmd_risk(args: argparse.Namespace) -> int:
         high_reasons.append("diff size")
 
     # Rule 3: evidence block, from the pull request for this branch.
-    pr = gh_json("body,labels,reviews,author", "pr", "view")
+    # FACTORY_PR names the pull request explicitly, for CI checkouts
+    # that carry no branch context.
+    pr_number = os.environ.get("FACTORY_PR")
+    pr = (
+        gh_json("body,labels,reviews,author", "pr", "view", pr_number)
+        if pr_number
+        else gh_json("body,labels,reviews,author", "pr", "view")
+    )
     head = git("rev-parse", "HEAD")
     evidence = parse_evidence_block(pr.get("body", "")) if pr else None
     if not pr:

@@ -33,6 +33,22 @@ Never guess an answer the user can give.
 When rewriting `CODING_STANDARDS.md`, keep each section's HTML comment
 instructions. The user fills the sections; the comments explain how.
 
+## Before you write, three setup steps
+
+1. **Scaffold a first passing test.** A check command with no tests
+   fails closed on the new baseline. When the check command runs a
+   test runner, write one placeholder test under the test directory
+   so `factory.py check` passes before the first ticket lands.
+2. **Create the label set on the tracker.** Run `gh label create` for
+   every label in `[labels]` in `factory.toml`. The upstream delegation
+   creates only the triage labels; the factory labels (`spec`,
+   `blocked`, `risk:low`, `risk:high`, `agent-merge`) are yours.
+3. **Reserve the upstream delegation output.** The upstream skill
+   writes `docs/agents/*.md` inside the OKF bundle, without typed
+   frontmatter. Add the reserved paths to `[docs].reserved` in
+   `factory.toml` (for example `agents/issue-tracker.md`,
+   `agents/domain.md`, `agents/triage-labels.md`).
+
 ## Files this skill deletes
 
 - `TEMPLATE.md`, because the project is no longer a template.
