@@ -21,3 +21,5 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
   and TEMPLATE.md expectations (#9).
 * **Change**: Removed the update log from the protected paths: the
   logging rule no longer closes the agent lane (#19).
+* **Creation**: Recorded the research on the mattpocock
+  software-factory-skill branch with per-feature recommendations (#19).
