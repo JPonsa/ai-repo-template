@@ -12,9 +12,17 @@ Every concept carries a `type`. The allowed types are `decision`,
 The list is defined in `factory.toml` and checked by
 `uv run scripts/factory.py docs`.
 
-Align with `mattpocock/skills` conventions where practical. Use `adr/` for
-architecture decision records when the upstream workflow expects them,
-and keep the OKF bundle for other durable knowledge.
+Use `adr/` for architecture decision records when the upstream
+workflow expects them, and keep the OKF bundle for other durable
+knowledge.
+
+Align with `mattpocock/skills` vocabulary where practical: the three
+brakes (automated checks, automated review, human review) map to the
+check, the review order, and the risk gate, as recorded in
+[the glossary](../GLOSSARY.md) and in
+[the research on their software-factory skill](research/0001-mattpocock-software-factory.md).
+Their autonomous-run terms (Run, Runner, Orchestrator) are not adopted:
+this factory is local and human-gated.
 
 # Decisions
 
