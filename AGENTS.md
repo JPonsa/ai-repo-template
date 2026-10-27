@@ -87,3 +87,6 @@ Use ASD-STE100 Simplified Technical English and British English spelling.
 - Edit a generated file instead of its source.
 - Weaken or skip a check to make a change pass.
 - Push to `main` or force-push a shared branch.
+
+## Retrospectives
+Run the `retro` skill (mattpocock/skills) on demand or after significant milestones. Follow `docs/runbook/retro.md` for factory-specific checklist items.
