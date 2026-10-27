@@ -1,5 +1,5 @@
 ---
-name: factory-retro
+name: ai-retro
 description: Run a factory-aligned retrospective using the global retro skill with factory-specific checklist.
 ---
 

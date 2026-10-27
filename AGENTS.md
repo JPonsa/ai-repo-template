@@ -89,4 +89,4 @@ Use ASD-STE100 Simplified Technical English and British English spelling.
 - Push to `main` or force-push a shared branch.
 
 ## Retrospectives
-Run the `factory-retro` skill (mattpocock/skills) on demand or after significant milestones. Follow `docs/runbook/retro.md` for factory-specific checklist items.
+Run the `ai-retro` skill (mattpocock/skills) on demand or after significant milestones. Follow `docs/runbook/ai-retro.md` for factory-specific checklist items.
