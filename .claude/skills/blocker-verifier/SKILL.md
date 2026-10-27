@@ -1,5 +1,5 @@
 ---
-name: finding-verifier
+name: blocker-verifier
 description: Take one blocker and start from the position that it is false. Reproduce or trace it, then return confirmed, refuted, or unproven. Runs with fresh context.
 ---
 

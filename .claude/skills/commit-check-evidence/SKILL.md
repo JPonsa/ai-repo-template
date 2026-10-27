@@ -1,5 +1,5 @@
 ---
-name: verify
+name: commit-check-evidence
 description: Run the one check command, record the exact commit, and produce a machine-readable evidence block bound to that commit.
 ---
 

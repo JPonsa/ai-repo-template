@@ -116,9 +116,9 @@ reserved = ["index.md", "log.md", "architectural-overview.md"]
 [skills]
 # Skills this template owns. They live in .claude/skills/.
 local = [
-  "verify",
+  "commit-check-evidence",
   "security-review",
-  "finding-verifier",
+  "blocker-verifier",
   "docs-knowledge",
   "setup-project",
 ]

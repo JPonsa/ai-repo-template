@@ -67,7 +67,7 @@ its commit must equal `HEAD`, or it is stale and rejected.
 
 Review order: `code-review` (standards and spec axes, fresh contexts),
 `security-review` (with an attack list, even for a clean verdict),
-`verify` (check result bound to the exact commit), `finding-verifier`
+`commit-check-evidence` (check result bound to the exact commit), `blocker-verifier`
 (every blocker starts as false).
 
 Each reviewer receives four inputs: the task contract, the spec, the
