@@ -26,3 +26,5 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
 * **Change**: Aligned the factory vocabulary with the upstream
   software-factory skill: glossary terms for the three brakes, the
   ticket tracker, the ticket source, and the ratchet (#19).
+* **Creation**: Recorded the research on running the factory under a
+  protected main branch, with a ruleset profile (#25).
