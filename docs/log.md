@@ -28,3 +28,5 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
   ticket tracker, the ticket source, and the ratchet (#19).
 * **Creation**: Recorded the research on running the factory under a
   protected main branch, with a ruleset profile (#25).
+* **Creation**: Recorded the research on GitHub Copilot as a reviewer
+  in the factory loop, including the gate defect it exposes (#20).
