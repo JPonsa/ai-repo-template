@@ -465,6 +465,10 @@ def cmd_risk(args: argparse.Namespace) -> int:
             print("risk:  evidence block matches HEAD")
 
     # Rule 4: the risk:high label and human approval.
+    # A bot approval is not a human approval: Copilot can submit
+    # APPROVED reviews when "Copilot approvals" are enabled (public
+    # preview). Decision 0002 keeps the human gate human, so bot
+    # authors (login ending in "[bot]") never count here.
     label_present = False
     approved_by: list[str] = []
     if pr:
@@ -472,10 +476,12 @@ def cmd_risk(args: argparse.Namespace) -> int:
         label_present = risk_high_label in pr_labels
         pr_author = (pr.get("author") or {}).get("login", "")
         approved_by = [
-            (review.get("author") or {}).get("login", "")
+            reviewer
             for review in pr.get("reviews", [])
             if review.get("state") == "APPROVED"
-            and (review.get("author") or {}).get("login", "") != pr_author
+            and (reviewer := (review.get("author") or {}).get("login", ""))
+            and reviewer != pr_author
+            and not reviewer.endswith("[bot]")
         ]
 
     if label_present and not approved_by:
