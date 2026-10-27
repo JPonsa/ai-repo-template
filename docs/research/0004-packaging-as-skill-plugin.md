@@ -1,4 +1,13 @@
-# Research: package the template as a skill or plugin with a setup wizard
+---
+type: research
+title: Package the template as a skill or plugin with a setup wizard
+description: Distribution options, wizard configuration inventory, update propagation, and recommendation against the "copied, not installed" rule.
+status: stable
+tags: [research, packaging, wizard, distribution]
+generated: { by: agent:opencode, at: 2026-10-27T00:00:00Z }
+stale_after: 2027-01-27T00:00:00Z
+sources: ["https://opencode.ai/docs/skills/", "https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/code-review"]
+---
 
 ## Summary
 
