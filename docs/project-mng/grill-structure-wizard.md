@@ -1,3 +1,14 @@
+---
+type: how-to
+title: Grill session - Structure evolution and wizard-driven setup
+description: Questions to stress-test the proposed structure and wizard flow against factory constraints.
+status: draft
+tags: [grill, structure, wizard, migration]
+generated: { by: agent:opencode, at: 2026-10-27T00:00:00Z }
+stale_after: 2027-01-27T00:00:00Z
+sources: ["https://github.com/anthropics/claude-plugins-official/blob/main/plugins/claude-md-management/skills/claude-md-improver/SKILL.md", "https://github.com/anthropics/claude-plugins-official/blob/main/plugins/claude-code-setup/skills/claude-automation-recommender/SKILL.md", "https://github.com/github/awesome-copilot/blob/main/agents/github-actions-expert.agent.md"]
+---
+
 # Grill session: Structure evolution and wizard-driven setup
 
 ## Goal
