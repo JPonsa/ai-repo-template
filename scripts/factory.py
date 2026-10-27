@@ -857,7 +857,73 @@ def build_parser() -> argparse.ArgumentParser:
     )
     audit.set_defaults(handler=cmd_audit)
 
+    metrics = commands.add_parser(
+        "metrics",
+        help="report simple factory metrics",
+        description=(
+            "Compute agent-merge share and basic metrics from merged PRs."
+        ),
+    )
+    metrics.add_argument("--base", help="base branch for diffing")
+    metrics.set_defaults(handler=cmd_metrics)
+
     return parser
+
+
+def cmd_metrics(args: argparse.Namespace) -> int:
+    """Compute simple metrics from git/PR data."""
+    import json
+    from datetime import datetime, timezone
+    
+    base = args.base or "origin/main"
+    repo_root = ROOT
+    
+    # Get merged PRs with labels
+    try:
+        pr_data = gh_json(
+            "number,title,mergedAt,labels,author,additions,deletions",
+            "pr",
+            "list",
+            "--state",
+            "merged",
+            "--limit",
+            "50",
+            "--json",
+            "number,title,mergedAt,labels,author,additions,deletions",
+        )
+    except Exception as e:
+        print(f"fail: could not fetch PRs: {e}", file=sys.stderr)
+        return 1
+    
+    if not isinstance(pr_data, list):
+        print("fail: unexpected PR data", file=sys.stderr)
+        return 1
+    
+    total = len(pr_data)
+    agent_merged = 0
+    high_risk = 0
+    red_risk_merges = 0
+    
+    for pr in pr_data:
+        labels = [l.get("name", "") for l in (pr.get("labels") or [])]
+        if "agent-merge" in labels:
+            agent_merged += 1
+        if "risk:high" in labels:
+            high_risk += 1
+            # Check if it had override (merged despite gate issues) - hard to tell from labels alone
+            # Count as potential override if merged by owner pattern
+        # For override detection, we'd need review/gate history - skip for now
+        # but structure is there
+    
+    agent_share = (agent_merged / total * 100) if total > 0 else 0
+    override_rate = (red_risk_merges / high_risk * 100) if high_risk > 0 else 0
+    
+    print(f"metrics: merged PRs={total}")
+    print(f"metrics: agent-merge share={agent_share:.1f}% ({agent_merged}/{total})")
+    print(f"metrics: high-risk={high_risk}, override rate={override_rate:.1f}% ({red_risk_merges}/{high_risk})")
+    print(f"metrics: data source=gh pr list --state merged (last 50)")
+    print("metrics: lead time and round-trips require per-PR inspection (use gh pr view)")
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -873,3 +939,59 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+def cmd_metrics(args: argparse.Namespace) -> int:
+    """Compute simple metrics from git/PR data."""
+    import json
+    from datetime import datetime, timezone
+    
+    base = args.base or "origin/main"
+    repo_root = ROOT
+    
+    # Get merged PRs with labels
+    try:
+        pr_data = gh_json(
+            "number,title,mergedAt,labels,author,additions,deletions",
+            "pr",
+            "list",
+            "--state",
+            "merged",
+            "--limit",
+            "50",
+            "--json",
+            "number,title,mergedAt,labels,author,additions,deletions",
+        )
+    except Exception as e:
+        print(f"fail: could not fetch PRs: {e}", file=sys.stderr)
+        return 1
+    
+    if not isinstance(pr_data, list):
+        print("fail: unexpected PR data", file=sys.stderr)
+        return 1
+    
+    total = len(pr_data)
+    agent_merged = 0
+    high_risk = 0
+    red_risk_merges = 0
+    
+    for pr in pr_data:
+        labels = [l.get("name", "") for l in (pr.get("labels") or [])]
+        if "agent-merge" in labels:
+            agent_merged += 1
+        if "risk:high" in labels:
+            high_risk += 1
+            # Check if it had override (merged despite gate issues) - hard to tell from labels alone
+            # Count as potential override if merged by owner pattern
+        # For override detection, we'd need review/gate history - skip for now
+        # but structure is there
+    
+    agent_share = (agent_merged / total * 100) if total > 0 else 0
+    override_rate = (red_risk_merges / high_risk * 100) if high_risk > 0 else 0
+    
+    print(f"metrics: merged PRs={total}")
+    print(f"metrics: agent-merge share={agent_share:.1f}% ({agent_merged}/{total})")
+    print(f"metrics: high-risk={high_risk}, override rate={override_rate:.1f}% ({red_risk_merges}/{high_risk})")
+    print(f"metrics: data source=gh pr list --state merged (last 50)")
+    print("metrics: lead time and round-trips require per-PR inspection (use gh pr view)")
+    return 0

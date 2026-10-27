@@ -96,5 +96,5 @@ monthly.
 - Override rate above zero for two months: re-cut the tickets so that
   harness changes become rare.
 
-Record a monthly retro in `docs/retros/` when any metric moves by more
+Record a monthly retro in `docs/project-mng/retros/` when any metric moves by more
 than half of its previous value.
