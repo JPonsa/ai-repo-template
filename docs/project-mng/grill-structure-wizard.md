@@ -1,5 +1,5 @@
 ---
-type: how-to
+type: research
 title: Grill session - Structure evolution and wizard-driven setup
 description: Questions to stress-test the proposed structure and wizard flow against factory constraints.
 status: draft
