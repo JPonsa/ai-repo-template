@@ -30,3 +30,4 @@ Newest first. One entry per merged change. Date headings use `YYYY-MM-DD`.
   protected main branch, with a ruleset profile (#25).
 * **Creation**: Recorded the research on GitHub Copilot as a reviewer
   in the factory loop, including the gate defect it exposes (#20).
+* **Creation**: Recorded the research on packaging the template as a skill or plugin with a setup wizard (#21).
