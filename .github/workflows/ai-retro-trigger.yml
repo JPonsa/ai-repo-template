@@ -1,0 +1,84 @@
+name: ai-retro trigger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  RETRO_THRESHOLD: 5
+
+jobs:
+  check-and-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Get last retro issue date
+        id: last_retro
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Find last issue with ai-retro label
+          last_date=$(gh issue list --label ai-retro --state closed --limit 1 --json closedAt --jq '.[0].closedAt // empty')
+          if [ -z "$last_date" ]; then
+            last_date=$(gh issue list --label ai-retro --state open --limit 1 --json createdAt --jq '.[0].createdAt // empty')
+          fi
+          if [ -z "$last_date" ]; then
+            # No retros yet, count all PRs
+            echo "since=1970-01-01T00:00:00Z" >> $GITHUB_OUTPUT
+          else
+            echo "since=$last_date" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Count PRs since last retro
+        id: count_prs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          since="${{ steps.last_retro.outputs.since }}"
+          count=$(gh pr list --state merged --base main --json mergedAt --jq "[.[] | select(.mergedAt > \"$since\")] | length")
+          echo "count=$count" >> $GITHUB_OUTPUT
+          echo "PRs merged since last retro: $count"
+          
+      - name: Check for existing open ai-retro issue
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          existing=$(gh issue list --label ai-retro --state open --limit 1 --json number --jq 'length')
+          echo "exists=$existing" >> $GITHUB_OUTPUT
+          
+      - name: Create ai-retro issue if threshold met
+        if: steps.count_prs.outputs.count >= env.RETRO_THRESHOLD && steps.existing.outputs.exists == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count="${{ steps.count_prs.outputs.count }}"
+          since="${{ steps.last_retro.outputs.since }}"
+          cat > /tmp/retro-issue.md << ISSUE
+## AI Retro Trigger
+
+**PRs merged since last retro:** $count (threshold: ${{ env.RETRO_THRESHOLD }})
+
+**Last retro reference:** $since
+
+## Action Required
+Run the \`ai-retro\` skill to conduct a factory-aligned retrospective.
+
+1. Load the \`ai-retro\` skill: \`skill({ name: "ai-retro" })\`
+2. Follow the checklist in \`docs/runbook/ai-retro.md\`
+3. Use the global \`retro\` skill for general analysis
+4. Save the retro summary to \`docs/project-mng/ai-retros/\` with date
+5. Close this issue when complete
+
+## Context
+Review the last $count merged PRs for patterns, improvements, and automation opportunities.
+ISSUE
+          gh issue create --title "AI Retro: $count PRs since last retro" --body-file /tmp/retro-issue.md --label "ai-retro"
