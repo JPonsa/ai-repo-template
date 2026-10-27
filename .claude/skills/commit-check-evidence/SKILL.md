@@ -12,11 +12,11 @@ re-running it. Fail closed: never report success without observed output.
 
 1. Identify the one check command from `factory.toml` under
    `[check].commands`. The entry point is always
-   `uv run scripts/factory.py check`. Do not add a second entry point.
+   `uv run .factory/factory.py check`. Do not add a second entry point.
 2. Record the exact commit before running:
    `git rev-parse HEAD`. If the working tree is dirty, stop and report
    that the evidence is not bound to a commit. Commit or stash first.
-3. Run `uv run scripts/factory.py check` and capture the full output,
+3. Run `uv run .factory/factory.py check` and capture the full output,
    including exit status.
 4. Assess test adequacy: does the observed output exercise the change?
    A passing check that never touched the changed code is not evidence.
@@ -28,7 +28,7 @@ re-running it. Fail closed: never report success without observed output.
 ## Evidence
 
 - commit: `<full sha>`
-- command: `uv run scripts/factory.py check`
+- command: `uv run .factory/factory.py check`
 - result: pass | fail
 - output (last line): `<observed last line>`
 ```

@@ -20,7 +20,7 @@ Those are installed once, globally, and recorded as prerequisites.
 - A workflow built on `mattpocock/skills`: grill, spec, tickets,
   implementation, test-driven development, review, pull request, retro.
 - A knowledge bundle in `docs/`, using Open Knowledge Format v0.2.
-- One check entry point, `scripts/factory.py`, with a risk gate that
+- One check entry point, `.factory/factory.py`, with a risk gate that
   decides whether an agent may merge.
 - Five local skills in `.claude/skills/`, read by both harnesses.
 
@@ -29,7 +29,7 @@ Those are installed once, globally, and recorded as prerequisites.
 | Tool | Version | Why |
 | --- | --- | --- |
 | `git` | any current version | version control |
-| `uv` | 0.12 or later | runs `scripts/factory.py` |
+| `uv` | 0.12 or later | runs `.factory/factory.py` |
 | `gh` | any current version, authenticated | issues, pull requests, CI |
 | `mattpocock/skills` | 1.3.1 | the workflow skills |
 
@@ -64,7 +64,7 @@ Use this repository as a GitHub template. Do **not** clone it directly.
 1. Click **Use this template** → **Create a new repository**.
 2. Clone the new repository to your machine.
 3. Install the global skills listed in [Prerequisites](#prerequisites).
-4. Run `uv run scripts/factory.py check` to verify the template baseline.
+4. Run `uv run .factory/factory.py check` to verify the template baseline.
 5. Start your agent and run the `setup-project` skill. It asks for the
    project identity, the stack, and the check command, writes the
    contracts, and deletes `TEMPLATE.md`.
@@ -76,7 +76,7 @@ Use this repository as a GitHub template. Do **not** clone it directly.
 ├── AGENTS.md              # instruction router for both harnesses
 ├── TEMPLATE.md            # instantiation guide; deleted on setup
 ├── factory.toml           # check command, risk paths, labels, doc types
-├── scripts/factory.py     # check | docs | risk | audit
+├── .factory/factory.py     # check | docs | risk | audit
 ├── docs/                  # OKF v0.2 knowledge bundle
 ├── .claude/skills/        # local skills, read by both harnesses
 ├── .claude/settings.json  # Claude Code permission rules

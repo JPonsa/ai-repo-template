@@ -22,7 +22,7 @@ Use the global `retro` skill from mattpocock/skills: `skill({ name: "retro" })`.
 ## Factory-specific checklist
 When running a retro in a factory repo, also check:
 
-- [ ] **Check command**: Is `uv run scripts/factory.py check` catching issues? Any gaps?
+- [ ] **Check command**: Is `uv run .factory/factory.py check` catching issues? Any gaps?
 - [ ] **CI workflow**: Are all required checks running? Any flaky jobs?
 - [ ] **Evidence blocks**: Are PRs consistently including valid evidence blocks?
 - [ ] **Risk gate**: Any false positives/negatives? Protected paths correct?

@@ -67,7 +67,7 @@ If not found, present install commands for detected harness or ask user.
 Load patterns from claude-md-improver: check length, clarity, organization, avoid duplication with other files, ensure it's the single source of truth. Suggest improvements, don't auto-apply.
 
 ## Implementation notes
-- All changes must pass `uv run scripts/factory.py check`
+- All changes must pass `uv run .factory/factory.py check`
 - Update AGENTS.md if skill names/locations change
 - Update commands in .opencode/commands/ if skill names change
 - factory.py audit needs to understand new structure if skills move

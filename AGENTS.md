@@ -26,7 +26,7 @@ and `GLOSSARY.md` for domain language.
 
 ## One command
 
-`uv run scripts/factory.py check` is the only check entry point. It runs
+`uv run .factory/factory.py check` is the only check entry point. It runs
 the commands in `factory.toml` and fails closed when source changed and
 nothing ran.
 

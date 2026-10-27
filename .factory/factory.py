@@ -11,7 +11,7 @@ Commands:
     risk    Classify a diff as low risk or high risk.
     audit   Report drift across the harness.
 
-Run with ``uv run scripts/factory.py <command>``.
+Run with ``uv run .factory/factory.py <command>``.
 
 The script uses the standard library only. ``tomllib`` supplies the
 configuration, so Python 3.11 or later is required.
@@ -30,7 +30,7 @@ import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CONFIG_PATH = ROOT / "factory.toml"
+CONFIG_PATH = ROOT / ".factory/factory.toml"
 
 FRONTMATTER_RE = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|\Z)", re.S)
 LINK_RE = re.compile(r"!?\[[^\]]*\]\(([^)\s]+)")
@@ -774,12 +774,12 @@ def build_parser() -> argparse.ArgumentParser:
         ),
         epilog=(
             "Examples:\n"
-            "  uv run scripts/factory.py check\n"
-            "  uv run scripts/factory.py check --base origin/main\n"
-            "  uv run scripts/factory.py docs\n"
-            "  uv run scripts/factory.py risk\n"
-            "  uv run scripts/factory.py risk --base main\n"
-            "  uv run scripts/factory.py audit\n"
+            "  uv run .factory/factory.py check\n"
+            "  uv run .factory/factory.py check --base origin/main\n"
+            "  uv run .factory/factory.py docs\n"
+            "  uv run .factory/factory.py risk\n"
+            "  uv run .factory/factory.py risk --base main\n"
+            "  uv run .factory/factory.py audit\n"
             "\n"
             "Configuration is read from factory.toml. "
             "`check` fails closed when source changes but no checks are configured. "

@@ -30,7 +30,7 @@ they can be reviewed and linked to the work.
 
 # Consequences
 
-- `uv run scripts/factory.py docs` fails on a missing `type`, a broken
+- `uv run .factory/factory.py docs` fails on a missing `type`, a broken
   relative link, or a missing bundle index.
 - A stale `stale_after` produces a warning, because time passing must not
   break continuous integration. `factory.py audit` reports it.

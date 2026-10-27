@@ -62,7 +62,7 @@ Based on current `setup-project` and TEMPLATE.md, what needs configuration:
 | Issue tracker labels | (ask) | factory.toml [labels] (triage + factory labels) | Required |
 | Document types | (ask) | factory.toml [docs].types | Required |
 | Risk ceilings | (keep defaults or ask?) | factory.toml [risk].max_files, max_added_lines | Defaults exist (20, 600). Maybe advanced option? |
-| Protected paths | (keep defaults?) | factory.toml [risk].protected_paths | Defaults include factory.toml, docs/index.md, AGENTS.md, CONTRIBUTING.md, scripts/factory.py etc. Template-specific; usually keep. |
+| Protected paths | (keep defaults?) | factory.toml [risk].protected_paths | Defaults include factory.toml, docs/index.md, AGENTS.md, CONTRIBUTING.md, .factory/factory.py etc. Template-specific; usually keep. |
 | Harness adapters | (auto-detect?) | .claude/skills/*, .opencode/commands/* | Already in template; setup doesn't change much. |
 | First test location | (infer from stack) | New test file | setup-project creates placeholder test |
 | Reserved doc paths | (auto-add from delegation) | factory.toml [docs].reserved | Added after delegating to setup-matt-pocock-skills |
@@ -73,7 +73,7 @@ Most of this is already in setup-project. A "wizard" could be the same thing, ma
 - **Current (copied):** No automatic propagation. Derived projects can pull upstream changes via git remote and merge - but conflicts likely. The knowledge bundle format (OKF) and contracts help, but it's manual.
 - **If installed as global skill/plugin:** The scaffolding logic updates, but already-scaffolded projects are unaffected. That’s good for the tool, bad for getting updates to enforcement/check logic into existing projects.
 - **If using npm installer:** Can pin template version, but still copied once.
-- **Key insight:** The enforcement (scripts/factory.py, CI workflow, risk gate logic) MUST live in the repo to work without network/external deps. Contracts (AGENTS.md, INTENT.md etc.) must live in repo. So "updates" to enforcement require changes in each repo - you can't update enforcement by updating a global skill. Only scaffolding/setup logic can be updated globally.
+- **Key insight:** The enforcement (.factory/factory.py, CI workflow, risk gate logic) MUST live in the repo to work without network/external deps. Contracts (AGENTS.md, INTENT.md etc.) must live in repo. So "updates" to enforcement require changes in each repo - you can't update enforcement by updating a global skill. Only scaffolding/setup logic can be updated globally.
 
 This reinforces the "copied, not installed" rule - it's not just about convenience, it's about the enforcement model.
 
@@ -132,7 +132,7 @@ Plugins in OpenCode (different from skills) can extend functionality - add tools
 From the inventory above, most things are configurable via setup-project already. A wizard could make this smoother (GUI-like prompts, validation). But the core questions are the same.
 
 ### Update propagation reality
-This is critical. The factory's value is in enforcement: the risk gate, check orchestration, docs validation, review order, CI workflow. ALL of these must live in the repo. You cannot make a repo depend on a global skill to run `uv run scripts/factory.py check` - that would break if the skill is removed/moved and violates "copied, not installed". 
+This is critical. The factory's value is in enforcement: the risk gate, check orchestration, docs validation, review order, CI workflow. ALL of these must live in the repo. You cannot make a repo depend on a global skill to run `uv run .factory/factory.py check` - that would break if the skill is removed/moved and violates "copied, not installed". 
 
 So even if packaged as a skill/plugin, after instantiation the repo must be fully self-contained. The packaging only affects HOW you create the repo, not how it operates. That means "updatability" benefit is limited to the scaffolding process itself. Existing repos won't auto-update enforcement.
 

@@ -49,7 +49,7 @@ batch with one evidence line per constituent is the cheaper option.
 | GitHub docs, rulesets | https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets (fetched 2026-10-27) |
 | GitHub REST, rules API | https://docs.github.com/en/rest/repos/rules (fetched 2026-10-27), including `GET /repos/{owner}/{repo}/rules/branches/{branch}` and `bypass_mode` semantics |
 | Self-approval block | Observed directly in this repository: `gh pr review` returns "Review Can not approve your own pull request" (session of 2026-10-25, PR #11) |
-| Our repository | `/mnt/c/Users/joanp/Projects/ai-repo-template` at merge commit of PR #24, 2026-10-27: `AGENTS.md`, `CONTRIBUTING.md`, `TEMPLATE.md`, `factory.toml`, `scripts/factory.py`, `.github/workflows/factory.yml`, `docs/decisions/0002-*`, `docs/decisions/0003-*` |
+| Our repository | `/mnt/c/Users/joanp/Projects/ai-repo-template` at merge commit of PR #24, 2026-10-27: `AGENTS.md`, `CONTRIBUTING.md`, `TEMPLATE.md`, `factory.toml`, `.factory/factory.py`, `.github/workflows/factory.yml`, `docs/decisions/0002-*`, `docs/decisions/0003-*` |
 | Issue | #25 |
 
 ## The three write paths and what protection touches
@@ -72,7 +72,7 @@ option as GitHub names it.
 | Dismiss stale approvals on push | New commits void approvals | No effect while no approvals are required. |
 | Require code owner review | CODEOWNERS must approve | Same deadlock as required approvals for solo owners: the owner is the only code owner. |
 | Require status checks (check, docs, secret scan, dependency audit) | Deterministic jobs must be green | Strengthens both lanes: the agent cannot merge a red check even if instructed to. No conflict: these jobs pass on every conforming diff. |
-| Require status checks (risk gate) | The risk job must be green | Fails by design on high-risk diffs (`scripts/factory.py`, `cmd_risk`). Requiring it hard-blocks high-risk merges for anyone without bypass; with owner bypass it becomes the audited record of decision 0002. |
+| Require status checks (risk gate) | The risk job must be green | Fails by design on high-risk diffs (`.factory/factory.py`, `cmd_risk`). Requiring it hard-blocks high-risk merges for anyone without bypass; with owner bypass it becomes the audited record of decision 0002. |
 | Require conversation resolution | All threads resolved | Compatible; no lane depends on open threads. |
 | Require signed commits | Commits must be signed | Adds key management for the agent identity; no factory conflict, but setup cost. |
 | Require linear history | Squash or rebase merges only | Changes revertability: today's merge commits revert one pull request each. Squash rewrites SHAs the evidence blocks bind (the pull request keeps the record, but `git revert` targets change). |
@@ -120,7 +120,7 @@ many.
 
 - **Size ceiling.** `factory.toml` `[risk]` sets `max_files = 20` and
   `max_added_lines = 600`. The risk gate counts the aggregate diff
-  (`scripts/factory.py`, `cmd_risk`, the `git diff --numstat` against
+  (`.factory/factory.py`, `cmd_risk`, the `git diff --numstat` against
   the merge base). Ten low-risk changes of 70 added lines each already
   breach the line ceiling: the batch is high risk by the gate's own
   arithmetic. Batching without changing the arithmetic closes the very
@@ -213,7 +213,7 @@ rules partially. Feasible, small, and a natural `audit` extension.
 - About protected branches: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
 - About rulesets: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets
 - REST endpoints for rules: https://docs.github.com/en/rest/repos/rules
-- Our repository: `AGENTS.md`, `CONTRIBUTING.md`, `TEMPLATE.md`, `factory.toml`, `scripts/factory.py`, `.github/workflows/factory.yml`, `docs/decisions/0002-owner-merge-is-human-approval.md`, `docs/decisions/0003-the-log-is-not-a-protected-path.md`
+- Our repository: `AGENTS.md`, `CONTRIBUTING.md`, `TEMPLATE.md`, `factory.toml`, `.factory/factory.py`, `.github/workflows/factory.yml`, `docs/decisions/0002-owner-merge-is-human-approval.md`, `docs/decisions/0003-the-log-is-not-a-protected-path.md`
 
 ## Limits of this research
 

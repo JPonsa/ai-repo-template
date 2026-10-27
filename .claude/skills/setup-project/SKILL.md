@@ -29,7 +29,7 @@ Never guess an answer the user can give.
 | CI workflows | Minimal (check only if desired) | Standard factory workflow | Full suite as provided |
 | Notes | Speed over strictness; checks still run | Balanced defaults | Maximum guardrails |
 
-Only risk thresholds change based on project type. The check gate (`uv run scripts/factory.py check`) is never weakened.
+Only risk thresholds change based on project type. The check gate (`uv run .factory/factory.py check`) is never weakened.
 
 ## Prerequisites check
 
@@ -120,8 +120,8 @@ Only do this after confirming mattpocock/skills is installed or user has been in
 Run these and show the output:
 
 ```bash
-uv run scripts/factory.py check
-uv run scripts/factory.py docs
+uv run .factory/factory.py check
+uv run .factory/factory.py docs
 ```
 
 Both must pass before you report done.

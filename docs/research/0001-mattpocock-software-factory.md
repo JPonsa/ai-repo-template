@@ -15,7 +15,7 @@ sources: [mattpocock/skills branch software-factory-skill at b59cab42bf1206e1363
 
 The branch adds one new skill, `software-factory`, to the `skills/in-progress/` bucket (SHA `99f13ca65db9`, path `skills/in-progress/software-factory/SKILL.md`). The skill is a **design-time glossary and reference set** for designing a *different kind* of factory from ours: a system of agents that turns "tickets, PRs and schedules into merged code, deployed on remote infrastructure the user chooses" (SKILL.md, first paragraph). It ships no scripts, no templates, no wizard and no configuration. It ships language: nine canonical terms, eleven example task patterns, four slot surveys for the products that fill the service slots, and a design-checking method ("start slow", "three brakes", "fill every slot", "question every task").
 
-Our template is an implemented factory for one repository: a check CLI, a risk gate, an audit, typed knowledge, adapters and a setup skill. Their branch is a vocabulary for designing an autonomous, multi-run, remote factory. The overlap is conceptual, not mechanical. Their three brakes (automated checks, automated review, human review) match mechanisms our template already enforces (`scripts/factory.py` check; `code-review` in the review order in `AGENTS.md`; the risk gate in `CONTRIBUTING.md`/`factory.toml`). Their survey format carries staleness discipline that matches our OKF research conventions. The branch is 12 commits ahead of our exact pinned commit and lives in a bucket that the upstream README says "can change or disappear without warning" (path `skills/in-progress/README.md`). Our pin needs no change now.
+Our template is an implemented factory for one repository: a check CLI, a risk gate, an audit, typed knowledge, adapters and a setup skill. Their branch is a vocabulary for designing an autonomous, multi-run, remote factory. The overlap is conceptual, not mechanical. Their three brakes (automated checks, automated review, human review) match mechanisms our template already enforces (`.factory/factory.py` check; `code-review` in the review order in `AGENTS.md`; the risk gate in `CONTRIBUTING.md`/`factory.toml`). Their survey format carries staleness discipline that matches our OKF research conventions. The branch is 12 commits ahead of our exact pinned commit and lives in a bucket that the upstream README says "can change or disappear without warning" (path `skills/in-progress/README.md`). Our pin needs no change now.
 
 Issue: #19 ("Research: mattpocock/skills software-factory-skill branch").
 
@@ -115,7 +115,7 @@ The README states: beta skills are "excluded from the plugin and the top-level R
 
 ## Comparison table: their software factory vs our template
 
-Sources: their `skills/in-progress/software-factory/SKILL.md` and surveys (branch head `b59cab4`); our `AGENTS.md`, `TEMPLATE.md`, `factory.toml`, `scripts/factory.py`, `docs/index.md`, `.claude/skills/setup-project/SKILL.md`.
+Sources: their `skills/in-progress/software-factory/SKILL.md` and surveys (branch head `b59cab4`); our `AGENTS.md`, `TEMPLATE.md`, `factory.toml`, `.factory/factory.py`, `docs/index.md`, `.claude/skills/setup-project/SKILL.md`.
 
 | Axis | Their software-factory skill | Our template |
 | --- | --- | --- |
@@ -123,7 +123,7 @@ Sources: their `skills/in-progress/software-factory/SKILL.md` and surveys (branc
 | **Object designed** | An autonomous multi-agent system on remote infrastructure: "a run never waits for a human" (SKILL.md, Run). | A single repository worked by one agent in one session, with a human at every merge decision (`AGENTS.md`, Risk). |
 | **Contracts** | Language contract only: canonical terms with avoid-lists. | Written contracts: `INTENT.md`, `CONTEXT.md`, `GLOSSARY.md`, `CODING_STANDARDS.md`, `CONTRIBUTING.md`, `AGENTS.md` (`TEMPLATE.md`, "Why the shape is like this"). |
 | **Knowledge** | Survey documents with survey date, staleness ranking, durable gotchas; the agent researches current options. | `docs/` as an OKF v0.2 bundle: typed frontmatter, `stale_after` deadlines, provenance in research docs (`docs/index.md`; `factory.py docs`). |
-| **Check CLI** | Named as a brake: "deterministic gates (types, lint, tests) that every run must pass" (SKILL.md, three brakes). No CLI shipped. | `scripts/factory.py`: `check` (fails closed when source changed and nothing ran), `docs`, `risk`, `audit` (`scripts/factory.py`). |
+| **Check CLI** | Named as a brake: "deterministic gates (types, lint, tests) that every run must pass" (SKILL.md, three brakes). No CLI shipped. | `.factory/factory.py`: `check` (fails closed when source changed and nothing ran), `docs`, `risk`, `audit` (`.factory/factory.py`). |
 | **Risk gate** | Human review as one brake among three; throttling and loop caps as soft design guidance. | A hard gate: protected paths, size ceiling, evidence block bound to `HEAD`, `risk:high` label plus human approval (`factory.py` `cmd_risk`; `factory.toml` `[risk]`). |
 | **Review order** | Automated review separated from human review; rework loops capped (EXAMPLE-TASKS.md). | `code-review` → `security-review` → `verify` → `finding-verifier`, each with fresh context, four inputs, no author reasoning (`AGENTS.md`, Evidence and review order). |
 | **Audit** | Not present. | `factory.py audit`: prerequisite skills present, docs valid, no unreferenced skills, no duplicated instructions between contract files, no permission drift between harnesses. |
@@ -146,7 +146,7 @@ Most patterns already exist here as upstream skills (`implement`, `code-review`,
 
 ### F3 Start slow / three brakes — **REJECT (as new wording); keep as confirmation**
 
-Our template already implements all three brakes as mechanisms: automated checks (`uv run scripts/factory.py check`, the only check entry point, `AGENTS.md` One command); automated review (`code-review` in the review order, `AGENTS.md`); human review (the risk gate and the owner's approval, `AGENTS.md` Risk). Restating their wording in our contract files would add a second statement of the same rules, which `factory.py audit` itself flags as a defect (`_duplicated_instructions`, `scripts/factory.py`). Reject the wording; cite their formulation only as external confirmation that our shape matches upstream thinking, if anything.
+Our template already implements all three brakes as mechanisms: automated checks (`uv run .factory/factory.py check`, the only check entry point, `AGENTS.md` One command); automated review (`code-review` in the review order, `AGENTS.md`); human review (the risk gate and the owner's approval, `AGENTS.md` Risk). Restating their wording in our contract files would add a second statement of the same rules, which `factory.py audit` itself flags as a defect (`_duplicated_instructions`, `.factory/factory.py`). Reject the wording; cite their formulation only as external confirmation that our shape matches upstream thinking, if anything.
 
 ### F4 Slot-survey format — **ADOPT (the format conventions, not the content)**
 
@@ -187,7 +187,7 @@ Our `factory.toml` pins `mattpocock/skills` version 1.3.1 at commit `5beb35b040e
 - `.changeset/software-factory-skill.md` at `b59cab4`: https://github.com/mattpocock/skills/blob/software-factory-skill/.changeset/software-factory-skill.md
 - `skills/in-progress/README.md` at `b59cab4`: https://github.com/mattpocock/skills/blob/software-factory-skill/skills/in-progress/README.md
 - `skills/engineering/setup-matt-pocock-skills/SKILL.md` at `main` (`5beb35b`): https://github.com/mattpocock/skills/blob/main/skills/engineering/setup-matt-pocock-skills/SKILL.md
-- Our repository (read-only, at `HEAD`, 2026-10-26): `AGENTS.md`, `INTENT.md`, `TEMPLATE.md`, `factory.toml`, `scripts/factory.py`, `docs/index.md`, `.claude/skills/setup-project/SKILL.md`
+- Our repository (read-only, at `HEAD`, 2026-10-26): `AGENTS.md`, `INTENT.md`, `TEMPLATE.md`, `factory.toml`, `.factory/factory.py`, `docs/index.md`, `.claude/skills/setup-project/SKILL.md`
 - Issue #19: `gh issue view 19` in `/mnt/c/Users/joanp/Projects/ai-repo-template`
 
 ## Limits of this research

@@ -1,4 +1,4 @@
-# Configuration for scripts/factory.py.
+# Configuration for .factory/factory.py.
 #
 # The factory CLI is the only reader of this file. Other documents point
 # here instead of restating these values.
@@ -22,7 +22,7 @@ base = "origin/main"
 # zero. Add the project's real test, lint, format, and type checks here.
 # Each entry runs through the system shell, in the repository root.
 commands = [
-  "uv run scripts/factory.py docs",
+  "uv run .factory/factory.py docs",
   "uv run python -m compileall -q scripts",
 ]
 
@@ -64,7 +64,7 @@ protected_paths = [
   "CONTRIBUTING.md",
   "TEMPLATE.md",
   "factory.toml",
-  "scripts/factory.py",
+  ".factory/factory.py",
   "LICENSE",
   "docs/index.md",
   "Dockerfile*",

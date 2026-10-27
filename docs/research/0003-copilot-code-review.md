@@ -28,7 +28,7 @@ reviews` call returns it.
 The defect: Copilot can submit approving reviews when "Copilot
 approvals" are enabled (public preview, off by default). Our risk gate
 counts any APPROVED review from an author other than the pull-request
-author as human approval (`scripts/factory.py`, `cmd_risk`). A Copilot
+author as human approval (`.factory/factory.py`, `cmd_risk`). A Copilot
 bot approval would satisfy that test today: the bot is not the pull
 request author. The gate must exclude bot authors, and the factory must
 keep Copilot approvals off — an AI approval must never stand in for the
@@ -48,7 +48,7 @@ feedback carefully. Supplement Copilot's feedback with a human review."
 | Using GitHub Copilot code review | https://docs.github.com/en/copilot/using-github-copilot/code-review/using-copilot-code-review (fetched 2026-10-27) |
 | GitHub Copilot code review (concepts) | https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/code-review (fetched 2026-10-27) |
 | Ruleset `copilot_code_review` rule | REST rules API, fetched 2026-10-27, recorded in `docs/research/0002-protected-main.md` |
-| Our gate code | `scripts/factory.py`, `cmd_risk`, the `approved_by` list comprehension |
+| Our gate code | `.factory/factory.py`, `cmd_risk`, the `approved_by` list comprehension |
 | Our review order | `AGENTS.md`, Evidence and review order |
 | Issue | #20 |
 
@@ -95,7 +95,7 @@ satisfies your repository's required-approval rule the same way a
 teammate's approval would" (concepts page, Copilot approvals, public
 preview). Approvals are off by default.
 
-Our gate, `cmd_risk` in `scripts/factory.py`:
+Our gate, `cmd_risk` in `.factory/factory.py`:
 
 ```python
 approved_by = [
@@ -189,7 +189,7 @@ should treat this as a per-review cost line.
 - https://docs.github.com/en/copilot/using-github-copilot/code-review/using-copilot-code-review
 - https://docs.github.com/en/copilot/concepts/agent-capabilities/agent-powered-workflows-and-operations/code-review
 - https://docs.github.com/en/rest/repos/rules (the `copilot_code_review` rule, via `docs/research/0002-protected-main.md`)
-- `scripts/factory.py` (`cmd_risk`), `AGENTS.md`,
+- `.factory/factory.py` (`cmd_risk`), `AGENTS.md`,
   `docs/decisions/0002-owner-merge-is-human-approval.md`
 
 ## Limits of this research

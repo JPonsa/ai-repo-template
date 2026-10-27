@@ -11,7 +11,7 @@
     { "action": "shell", "resource": "git diff *", "effect": "allow" },
     { "action": "shell", "resource": "git log *", "effect": "allow" },
     { "action": "shell", "resource": "git show *", "effect": "allow" },
-    { "action": "shell", "resource": "uv run scripts/factory.py *", "effect": "allow" },
+    { "action": "shell", "resource": "uv run .factory/factory.py *", "effect": "allow" },
     // Pushes ask, force pushes included.
     { "action": "shell", "resource": "git push *", "effect": "ask" },
     // Secret files ask on read.
@@ -27,6 +27,6 @@
     { "action": "edit", "resource": "CODING_STANDARDS.md", "effect": "ask" },
     { "action": "edit", "resource": "CONTRIBUTING.md", "effect": "ask" },
     { "action": "edit", "resource": "factory.toml", "effect": "ask" },
-    { "action": "edit", "resource": "scripts/factory.py", "effect": "ask" }
+    { "action": "edit", "resource": ".factory/factory.py", "effect": "ask" }
   ]
 }

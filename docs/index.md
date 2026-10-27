@@ -10,7 +10,7 @@ issue tracker, not here.
 Every concept carries a `type`. The allowed types are `decision`,
 `concept`, `runbook`, `research`, `metric`, `retro`, and `playbook`.
 The list is defined in `factory.toml` and checked by
-`uv run scripts/factory.py docs`.
+`uv run .factory/factory.py docs`.
 
 Use `adr/` for architecture decision records when the upstream
 workflow expects them, and keep the OKF bundle for other durable
@@ -50,7 +50,7 @@ folder name equal to the plural of the type.
 * `runbooks/` - repeatable operational steps.
 * `research/` - findings from sources, with provenance.
 * `metrics/` - definitions and formulas.
-  The set the factory tracks is [factory.md](metrics/factory.md).
+  Metrics are tracked via `uv run .factory/factory.py metrics`.
 * `retros/` - what changed after a piece of work.
 * `playbooks/` - multi-step procedures that are not tied to operations.
 * `how-to/` - task-focused guides for common procedures.

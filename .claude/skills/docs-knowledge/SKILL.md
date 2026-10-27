@@ -6,7 +6,7 @@ description: Read and write the OKF v0.2 bundle under docs/. Enforce typed front
 # Docs knowledge
 
 Read and write the knowledge bundle in `docs/`. The bundle follows
-Open Knowledge Format v0.2. `uv run scripts/factory.py docs` validates
+Open Knowledge Format v0.2. `uv run .factory/factory.py docs` validates
 the structure; this skill governs how you write into it.
 
 ## The seven allowed types
@@ -58,7 +58,7 @@ entries.
 
 ## Rules
 
-- Run `uv run scripts/factory.py docs` after every write. It must pass.
+- Run `uv run .factory/factory.py docs` after every write. It must pass.
 - Never put specs or tickets in the bundle. They live on the issue
   tracker.
 - Never restate a decision in a second document. Link to it.

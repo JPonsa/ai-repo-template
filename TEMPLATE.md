@@ -15,7 +15,7 @@ prerequisites.
 | Tool | Why | Check |
 | --- | --- | --- |
 | `git` | version control | `git --version` |
-| `uv` 0.12 or later | runs `scripts/factory.py` | `uv --version` |
+| `uv` 0.12 or later | runs `.factory/factory.py` | `uv --version` |
 | `gh` | issues, pull requests, CI | `gh auth status` |
 | An agent harness | OpenCode or Claude Code | the harness starts |
 
@@ -116,8 +116,8 @@ first line `@AGENTS.md` instead of copying content into it.
 ## Verify the result
 
 ```bash
-uv run scripts/factory.py check
-uv run scripts/factory.py docs
+uv run .factory/factory.py check
+uv run .factory/factory.py docs
 ```
 
 `check` runs the commands in `factory.toml`. `docs` validates the
@@ -130,7 +130,7 @@ knowledge bundle.
 | Contracts | `INTENT.md`, `CONTEXT.md`, `GLOSSARY.md`, `CODING_STANDARDS.md` |
 | Workflow | global `mattpocock/skills` |
 | Knowledge | `docs/` as an OKF v0.2 bundle |
-| Enforcement | `scripts/factory.py`, CI, ticket labels |
+| Enforcement | `.factory/factory.py`, CI, ticket labels |
 | Adapters | `.claude/skills/`, `.opencode/commands/`, permission files |
 
 One meaning, one place. A rule lives in one file and is referenced

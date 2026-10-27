@@ -19,7 +19,7 @@ Stress-test the proposed final structure and wizard flow against the factory's h
 - AGENTS.md is the only instruction file; don't add CLAUDE.md
 - Both harnesses must work (OpenCode and Claude Code)
 - Local skills in `.claude/skills/` read by both; slash commands only for local skills
-- `uv run scripts/factory.py check` must remain the only check entry point
+- `uv run .factory/factory.py check` must remain the only check entry point
 - Risk gate, protected paths, evidence blocks unchanged in principle
 - Never reimplement missing upstream skill inline
 

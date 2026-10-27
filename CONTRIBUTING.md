@@ -30,7 +30,7 @@ prerequisites for the agent workflow are in [TEMPLATE.md](TEMPLATE.md).
 Run the check before and after your change:
 
 ```bash
-uv run scripts/factory.py check
+uv run .factory/factory.py check
 ```
 
 The command list is in `factory.toml`. Do not add a second entry point.
@@ -86,7 +86,7 @@ The evidence block is a comment, so it stays invisible when rendered:
 ```text
 <!-- factory:evidence
 commit: <sha>
-check: uv run scripts/factory.py check
+check: uv run .factory/factory.py check
 result: pass
 risk: low
 -->
@@ -134,7 +134,7 @@ A change is done when:
 
 - The requested behaviour exists.
 - A test covers the new behaviour.
-- `uv run scripts/factory.py check` passes on the final commit.
+- `uv run .factory/factory.py check` passes on the final commit.
 - Documentation and the `docs/log.md` entry are current, where relevant.
 - The pull request carries valid evidence.
 - Every surviving review blocker is resolved.

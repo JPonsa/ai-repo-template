@@ -9,7 +9,7 @@ generated: { by: agent:opencode, at: 2026-10-25T00:00:00Z }
 
 # Context
 
-The risk gate in `scripts/factory.py risk` fails a pull request that is
+The risk gate in `.factory/factory.py risk` fails a pull request that is
 structurally high risk unless it is labelled `risk:high` and carries an
 APPROVED review from an account other than the pull-request author.
 

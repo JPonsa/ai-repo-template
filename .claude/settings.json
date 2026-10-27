@@ -5,7 +5,7 @@
       "Bash(git diff*)",
       "Bash(git log*)",
       "Bash(git show*)",
-      "Bash(uv run scripts/factory.py*)"
+      "Bash(uv run .factory/factory.py*)"
     ],
     "ask": [
       "Bash(git push*)",
@@ -17,7 +17,7 @@
       "Edit(CODING_STANDARDS.md)",
       "Edit(CONTRIBUTING.md)",
       "Edit(factory.toml)",
-      "Edit(scripts/factory.py)"
+      "Edit(.factory/factory.py)"
     ]
   }
 }

@@ -38,7 +38,7 @@ Rules:
 > add project terms after them.
 > -->
 
-**Check** — _`uv run scripts/factory.py check`: the one entry point that runs the automated checks. Upstream vocabulary: an **automated check**, one of the three brakes._
+**Check** — _`uv run .factory/factory.py check`: the one entry point that runs the automated checks. Upstream vocabulary: an **automated check**, one of the three brakes._
 - Avoid: build, test run, CI run.
 
 **Review order** — _`code-review`, `security-review`, `verify`, `finding-verifier`, each in a fresh context. Upstream vocabulary: **automated review**, the second brake._
