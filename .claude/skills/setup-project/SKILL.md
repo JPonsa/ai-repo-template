@@ -59,7 +59,7 @@ Before setup, check for required global skills:
 | `CONTRIBUTING.md` | project-specific setup and validation commands |
 | `factory.toml` | project identity, check commands, risk ceilings per project type |
 | `docs/log.md` | first entry for the new project |
-| `docs/architectural-overview.md` | replace template placeholders with the real architecture |
+| `docs/project-mng/architectural-overview.md` | replace template placeholders with the real architecture |
 
 When rewriting `CODING_STANDARDS.md`, keep each section's HTML comment
 instructions. The user fills the sections; the comments explain how.

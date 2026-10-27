@@ -20,7 +20,7 @@ and `GLOSSARY.md` for domain language.
 | Code rules | `CODING_STANDARDS.md` |
 | Branch, commit, and review rules | `CONTRIBUTING.md` |
 | Decisions, runbooks, research | `docs/index.md` |
-| Architecture, kept current | `docs/architectural-overview.md` |
+| Architecture, kept current | `docs/project-mng/architectural-overview.md` |
 | Harness configuration | `factory.toml` |
 | Starting a derived project | `TEMPLATE.md` |
 
@@ -36,7 +36,7 @@ Create or pick an issue, then branch from `main` as
 `<type>/<issue>-<short-description>`. Write a spec when the work spans
 more than one commit, and split it into tickets that each fit in one
 context window. Implement one ticket at a time, with a test at each
-agreed seam. Update `docs/architectural-overview.md` when module
+agreed seam. Update `docs/project-mng/architectural-overview.md` when module
 boundaries, dependencies, data flows, or public interfaces change.
 Use conventional commits: `type(scope): short description`.
 Review and pull-request detail is in `CONTRIBUTING.md`.

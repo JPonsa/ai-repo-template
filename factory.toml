@@ -110,7 +110,7 @@ types = [
   "retro",
   "playbook",
 ]
-reserved = ["index.md", "log.md", "architectural-overview.md"]
+reserved = ["index.md", "log.md", "project-mng/architectural-overview.md"]
 
 
 [skills]
