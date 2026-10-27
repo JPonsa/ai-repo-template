@@ -71,3 +71,42 @@ Load patterns from claude-md-improver: check length, clarity, organization, avoi
 - Update AGENTS.md if skill names/locations change
 - Update commands in .opencode/commands/ if skill names change
 - factory.py audit needs to understand new structure if skills move
+
+## Updates based on grill feedback
+
+### [1] Skills location
+- Keep `.claude/skills/` as primary (Claude Code native). OpenCode reads it as compatibility path (as stated in AGENTS.md).
+- Add support for `.agents/skills/` discovery for OpenCode/other agents.
+- If setup-project detects harness is Claude Code and `.agents/skills/` is used but `.claude/skills/` missing, create symlink from `.claude/skills/` to `.agents/skills/` (or copy). Be careful about symlinks on different filesystems.
+
+### [2] Renames done
+- `verify` -> `commit-check-evidence`, `finding-verifier` -> `blocker-verifier`. All references updated, commands renamed.
+
+### [4] Docs reorganization recommendation
+- **adr/** - must keep for Architecture Decision Records (technical). 
+- **decisions/** - keep for non-technical/process decisions. Clear separation is good.
+- **architectural-overview.md** - recommend moving to `docs/project-mng/architectural-overview.md`. Update AGENTS.md references, update `factory.toml` reserved paths, update any links. This groups project management docs together.
+- Need to update docs validation/index if it has assumptions.
+
+### [6] Skills packaging
+- Skills can include `assets/`, `references/`, `scripts/` subdirectories - OpenCode skills support additional files. Wizard can package entire skill directories.
+
+### [7] Project types
+Project type only affects pre-selected config during wizard to speed setup:
+- **prototype**: fewer CI checks/workflows, less restrictive (maybe skip sonar-scan, simpler workflows), higher risk ceilings
+- **simple/standard**: current defaults
+- **production-ready**: full CI suite, stricter thresholds
+
+Never weaken the `check` gate itself.
+
+### [11] Retro integration
+Matt Pocock has a `retro` skill (engineering/retro) - useful. Factory should integrate with it:
+- Can be triggered automatically after N PRs merged, or on demand
+- Focus on factory environment improvements (navigation, automated checks, coding standards, AGENTS.md, guardrails)
+- Align with factory's check command and CI - read factory.yml, factory.toml
+- May need factory-specific extensions to cover evidence blocks, risk gate, review order
+- Don't duplicate - delegate to retro skill where appropriate, extend for factory-specific concerns
+
+### [13] setup-project vs wizard
+- **setup-project** (local skill in .claude/skills/): Customizes an EXISTING copied template. Runs in-repo, asks 5 questions, rewrites files, creates test/labels, delegates to setup-matt-pocock-skills, deletes TEMPLATE.md.
+- **Wizard**: Creates a NEW project from scratch or guides full setup. Broader scope - project type selection, prerequisite checking/installation guidance, AGENTS.md review, automation suggestions, retro setup, config lifecycle management. Can be global skill that copies template files, or enhanced local skill. Wizard may call setup-project or incorporate its logic.
